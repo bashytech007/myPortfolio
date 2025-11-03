@@ -1,9 +1,22 @@
-.card {
+/* .card {
     background: var(--color-white);
     padding: 1.5rem;
     border: 2px solid transparent;
     border-radius: var(--border-radius-1);
     transition: var(--transition);
+} */
+
+
+.card {
+  height: 100%; /* ✅ fill the grid cell */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--color-white);
+  padding: 1.5rem;
+  border: 2px solid transparent;
+  border-radius: var(--border-radius-1);
+  transition: var(--transition);
 }
 
 .card:hover {
