@@ -49,8 +49,8 @@ const data = [
     image: Image3,
     title: "Loop Studios",
     desc: "A VR gaming Platform",
-    demo: "https://github.com/bashytech007/loopstudios",
-    github: "https://loopstudios-pied.vercel.app/",
+  demo: "https://loopstudios-pied.vercel.app/",        // ✅ Fixed
+  github: "https://github.com/bashytech007/loopstudios", // ✅ Fixed
   },
   {
     id: 2,
