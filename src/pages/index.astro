@@ -490,6 +490,12 @@ const number = {
       animation: ticker 48s linear infinite;
     }
 
+    .ticker:focus-within .ticker__track {
+      animation-play-state: paused;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
     .ticker:hover .ticker__track {
       animation-play-state: paused;
     }
