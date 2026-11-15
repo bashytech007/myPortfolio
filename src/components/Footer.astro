@@ -1,26 +1,32 @@
 ---
-import { links, site } from '../lib/site';
+import { links, site, terminal } from '../lib/site';
 
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
-  <div class="container site-footer__inner">
-    <p>
-      &copy; {year}
-      {site.name}. <a href="/security">How this site is hardened</a>
-    </p>
-    <ul aria-label="Profiles">
-      {
-        links.social.map((item) => (
-          <li>
-            <a href={item.href} rel="me noopener noreferrer">
-              {item.label}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+  <div class="container">
+    <div class="site-footer__top">
+      <p class="site-footer__name" aria-hidden="true">{site.name}</p>
+      <a class="label arrow-link site-footer__up" href="#main">Back to top</a>
+    </div>
+
+    <div class="site-footer__meta">
+      <p class="label">&copy; {year} {site.name} / {site.location}</p>
+      <ul class="site-footer__links" aria-label="Site and profiles">
+        <li><a class="label" href="/security">How this site is hardened</a></li>
+        <li><a class="label" href={terminal.href}>{terminal.label}</a></li>
+        {
+          links.social.map((item) => (
+            <li>
+              <a class="label" href={item.href} rel="me noopener noreferrer">
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </div>
 </footer>
 
@@ -28,43 +34,65 @@ const year = new Date().getFullYear();
   .site-footer {
     margin-block-start: var(--section-gap);
     border-block-start: var(--hairline) solid var(--border);
-    color: var(--muted);
-    font-size: var(--text-sm);
   }
 
-  .site-footer__inner {
+  .site-footer__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--s-3);
+    padding-block: var(--s-8) var(--s-6);
+  }
+
+  /* The name once more, large, as the last thing on the page. */
+  .site-footer__name {
+    font-size: clamp(2.75rem, 11vw, 8rem);
+    font-weight: 800;
+    line-height: 0.88;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+  }
+
+  .site-footer__up::after {
+    content: '\2191'; /* up arrow */
+  }
+
+  .site-footer__up:hover::after {
+    transform: translateY(-3px);
+  }
+
+  .site-footer__meta {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: var(--s-1) var(--s-3);
-    padding-block: var(--s-3);
+    gap: var(--s-1) var(--s-4);
+    padding-block: var(--s-2) var(--s-3);
+    border-block-start: var(--hairline) solid var(--border);
   }
 
-  ul {
+  .site-footer__links {
     display: flex;
-    gap: var(--s-1);
-    margin-inline: calc(var(--s-1) * -1);
+    flex-wrap: wrap;
+    gap: 0 var(--s-3);
   }
 
-  a {
-    color: var(--muted);
-    text-decoration-color: transparent;
-  }
-
-  a:hover {
-    color: var(--text);
-    text-decoration-color: currentColor;
-  }
-
-  li a {
+  .site-footer__links a {
     display: inline-flex;
     align-items: center;
     min-height: 2.75rem;
-    padding-inline: var(--s-1);
+    text-decoration: none;
+    transition: color 160ms var(--ease);
   }
 
-  p a {
-    text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  .site-footer__links a:hover {
+    color: var(--text);
+  }
+
+  @media (min-width: 48rem) {
+    .site-footer__top {
+      padding-block: var(--s-12) var(--s-8);
+    }
   }
 </style>
