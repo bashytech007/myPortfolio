@@ -1,0 +1,101 @@
+---
+import '../styles/terminal.css';
+import Base from '../layouts/Base.astro';
+import { nav, site } from '../lib/site';
+---
+
+<Base title="Page not found" description="There is no page at this address." noindex>
+  <div class="container notfound">
+    <p class="label label--accent">404</p>
+    <h1>Command not found</h1>
+    <p class="lead">There is no page at this address. It may have moved, or the link may be wrong.</p>
+
+    <div class="terminal notfound__terminal" role="img" aria-label="A terminal showing: command not found">
+      <div class="terminal__bar" aria-hidden="true">
+        <span class="terminal__dots"><i></i><i></i><i></i></span>
+        <p class="terminal__title">visitor@{site.handle}: ~</p>
+        <span></span>
+      </div>
+      <div class="terminal__screen notfound__screen" aria-hidden="true">
+        <div class="term-entry">
+          <p class="term-line">
+            <span class="term-prompt">$</span>
+            <span class="term-cmd" data-not-found-path>cd /this-page</span>
+          </p>
+          <div class="term-out">
+            <p>command not found</p>
+          </div>
+        </div>
+        <p class="term-line">
+          <span class="term-prompt">$</span>
+          <span class="term-cmd">cd ~</span>
+          <span class="term-cursor"></span>
+        </p>
+      </div>
+    </div>
+
+    <p class="notfound__actions">
+      <a class="btn btn--primary" href="/">Go home</a>
+      {
+        nav
+          .filter((item) => !item.href.includes('#'))
+          .map((item) => (
+            <a class="btn" href={item.href}>
+              {item.label}
+            </a>
+          ))
+      }
+    </p>
+  </div>
+</Base>
+
+<script>
+  // Show the address that was asked for. Inserted as text, never as HTML.
+  const target = document.querySelector<HTMLElement>('[data-not-found-path]');
+  if (target) {
+    let path = location.pathname;
+    try {
+      path = decodeURI(path);
+    } catch {
+      // Keep the raw path if it is not valid percent-encoding.
+    }
+    target.textContent = `cd ${path.length > 60 ? `${path.slice(0, 60)}...` : path}`;
+  }
+</script>
+
+<style>
+  .notfound {
+    padding-block-start: var(--s-8);
+  }
+
+  .notfound h1 {
+    margin-block-start: var(--s-2);
+    font-size: clamp(2.25rem, 1.6rem + 3vw, 3.5rem);
+  }
+
+  .notfound .lead {
+    margin-block-start: var(--s-3);
+  }
+
+  .notfound__terminal {
+    max-width: 40rem;
+    margin-block-start: var(--s-5);
+  }
+
+  .notfound__screen {
+    padding-block-end: var(--term-pad);
+  }
+
+  .notfound__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-block-start: var(--s-5);
+  }
+
+  @media (min-width: 48rem) {
+    .notfound {
+      padding-block-start: var(--s-12);
+    }
+  }
+</style>
