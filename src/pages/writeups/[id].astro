@@ -1,0 +1,178 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { formatDate, getWriteups, WRITEUP_SECTIONS, type Writeup } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const writeups = await getWriteups();
+  return writeups.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+interface Props {
+  entry: Writeup;
+}
+
+const { entry } = Astro.props;
+const { title, summary, date, target, tags, draft } = entry.data;
+const { Content, headings } = await render(entry);
+
+// Every write-up has the same five sections. Fail the build with a clear
+// message if one is missing, renamed or out of order.
+const found = headings.filter((h) => h.depth === 2);
+const matches =
+  found.length === WRITEUP_SECTIONS.length &&
+  WRITEUP_SECTIONS.every((name, i) => found[i]?.text.trim() === name);
+if (!matches) {
+  throw new Error(
+    `src/content/writeups/${entry.id}.md must have exactly these "##" headings, in this order: ` +
+      `${WRITEUP_SECTIONS.join(', ')}. Found: ${found.map((h) => h.text).join(', ') || 'none'}.`,
+  );
+}
+---
+
+<Base title={title} description={summary} ogType="article" noindex={draft}>
+  <article class="container writeup">
+    <header class="page-head">
+      <p class="writeup__back"><a href="/writeups">Write-ups</a></p>
+      {
+        draft && (
+          <p class="writeup__draft" role="note">
+            <span class="tag tag--draft">Draft</span>
+            This is a placeholder. It is not included in production builds.
+          </p>
+        )
+      }
+      <h1>{title}</h1>
+      <p class="lead">{summary}</p>
+      <dl class="writeup__facts">
+        <div>
+          <dt class="label">Published</dt>
+          <dd><time datetime={date.toISOString().slice(0, 10)}>{formatDate(date)}</time></dd>
+        </div>
+        {
+          target && (
+            <div>
+              <dt class="label">Target</dt>
+              <dd>{target}</dd>
+            </div>
+          )
+        }
+        {
+          tags.length > 0 && (
+            <div>
+              <dt class="label">Tags</dt>
+              <dd>{tags.join(', ')}</dd>
+            </div>
+          )
+        }
+      </dl>
+    </header>
+
+    <div class="writeup__layout">
+      <nav class="writeup__toc" aria-label="Sections">
+        <p class="label">Sections</p>
+        <ol>
+          {
+            found.map((heading) => (
+              <li>
+                <a href={`#${heading.slug}`}>{heading.text}</a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .writeup .page-head h1 {
+    max-width: 22ch;
+  }
+
+  .writeup__back {
+    margin-block-end: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .writeup__back a::before {
+    content: '< ';
+  }
+
+  .writeup__draft {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-1) var(--s-2);
+    margin-block-end: var(--s-3);
+    color: var(--muted);
+    font-size: var(--text-md);
+  }
+
+  .writeup__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-6);
+    margin-block-start: var(--s-5);
+    padding-block: var(--s-3);
+    border-block: var(--hairline) solid var(--border);
+    font-size: var(--text-md);
+  }
+
+  .writeup__facts dd {
+    margin-block-start: 0.25rem;
+  }
+
+  .writeup__layout {
+    display: grid;
+    gap: var(--s-5);
+    margin-block-start: var(--s-6);
+  }
+
+  .writeup__toc ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-3);
+    margin-block-start: var(--s-1);
+    font-size: var(--text-md);
+  }
+
+  .writeup__toc a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    color: var(--muted);
+    text-decoration-color: transparent;
+  }
+
+  .writeup__toc a:hover {
+    color: var(--text);
+  }
+
+  /* The first section follows the header directly. */
+  .prose > :global(h2:first-child) {
+    margin-block-start: 0;
+  }
+
+  @media (min-width: 64rem) {
+    .writeup__layout {
+      grid-template-columns: minmax(0, var(--measure)) 12rem;
+      justify-content: space-between;
+      align-items: start;
+    }
+
+    .writeup__toc {
+      position: sticky;
+      inset-block-start: var(--s-4);
+      order: 2;
+    }
+
+    .writeup__toc ol {
+      flex-direction: column;
+    }
+  }
+</style>

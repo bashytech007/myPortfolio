@@ -1,0 +1,53 @@
+---
+import Base from '../../layouts/Base.astro';
+import WriteupList from '../../components/WriteupList.astro';
+import { getWriteups, WRITEUP_SECTIONS } from '../../lib/content';
+
+const writeups = await getWriteups();
+const sections = WRITEUP_SECTIONS.map((s) => s.toLowerCase());
+const sectionList = `${sections.slice(0, -1).join(', ')} and ${sections.at(-1)}`;
+---
+
+<Base
+  title="Write-ups"
+  description="Security case studies by Bashir Aremu. Each one covers the context, threat model, finding, impact and fix."
+>
+  <div class="container">
+    <header class="page-head">
+      <h1>Write-ups</h1>
+      <p class="lead">
+        Case studies from security testing. Each one follows the same structure: {sectionList}.
+      </p>
+    </header>
+
+    <section class="section" aria-label="All write-ups">
+      {
+        writeups.length > 0 ? (
+          <WriteupList writeups={writeups} />
+        ) : (
+          <div class="card empty">
+            <p class="label">Nothing published yet</p>
+            <p>
+              No write-ups are published yet. Until they are, the{' '}
+              <a href="/security">security page</a> explains how this site is built, and the{' '}
+              <a href="/projects">projects page</a> lists what I've made.
+            </p>
+          </div>
+        )
+      }
+    </section>
+  </div>
+</Base>
+
+<style>
+  .empty {
+    display: grid;
+    gap: var(--s-2);
+    max-width: 44rem;
+    padding: var(--s-4);
+  }
+
+  .empty p:last-child {
+    color: var(--muted);
+  }
+</style>

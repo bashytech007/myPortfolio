@@ -1,0 +1,108 @@
+---
+import { formatDate, type Writeup } from '../lib/content';
+
+interface Props {
+  writeups: Writeup[];
+  /** Heading level for each title, so the list fits the page outline. */
+  level?: 2 | 3;
+}
+
+const { writeups, level = 2 } = Astro.props;
+const Heading = `h${level}` as 'h2' | 'h3';
+---
+
+<ul class="rows writeups">
+  {
+    writeups.map((entry) => (
+      <li class="writeup">
+        <p class="writeup__meta">
+          <time datetime={entry.data.date.toISOString().slice(0, 10)}>{formatDate(entry.data.date)}</time>
+          {entry.data.target && <span>{entry.data.target}</span>}
+        </p>
+        <div class="writeup__main">
+          <Heading class="writeup__title">
+            <a href={`/writeups/${entry.id}`}>{entry.data.title}</a>
+          </Heading>
+          <p class="writeup__summary">{entry.data.summary}</p>
+        </div>
+        {entry.data.draft && <span class="tag tag--draft">Draft</span>}
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .writeup {
+    position: relative;
+    display: grid;
+    gap: var(--s-1);
+    padding-block: var(--s-3);
+    transition: background-color 120ms var(--ease);
+  }
+
+  .writeup__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: 1.75rem;
+    color: var(--muted);
+  }
+
+  .writeup__title {
+    font-size: var(--text-lg);
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+  }
+
+  .writeup__title a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  /* The whole row is the link target; the title carries the name. */
+  .writeup__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .writeup:hover .writeup__title a {
+    color: var(--accent);
+  }
+
+  .writeup__title a:focus-visible {
+    outline: none;
+  }
+
+  .writeup:has(a:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .writeup__summary {
+    max-width: var(--measure);
+    margin-block-start: var(--s-1);
+    color: var(--muted);
+    font-size: var(--text-md);
+    line-height: 1.55;
+  }
+
+  .writeup .tag {
+    justify-self: start;
+  }
+
+  @media (min-width: 48rem) {
+    .writeup {
+      grid-template-columns: 11rem minmax(0, 1fr) auto;
+      gap: var(--s-3);
+      align-items: start;
+    }
+
+    .writeup__meta {
+      flex-direction: column;
+    }
+  }
+</style>
