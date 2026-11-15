@@ -593,7 +593,6 @@ html:not(.js) .tty__prompt {
 
   .term-input,
   .term-ghost {
-    font-size: inherit;
     line-height: 2rem;
   }
 
@@ -624,6 +623,16 @@ html:not(.js) .tty__prompt {
 
   .tty__chips {
     display: flex;
+  }
+
+}
+
+/* Smaller type and chips only for a mouse: under 16px iOS zooms the page when
+   the input gains focus, and a finger needs the taller chip. */
+@media (min-width: 48rem) and (pointer: fine) {
+  .term-input,
+  .term-ghost {
+    font-size: inherit;
   }
 
   .term-chip {
