@@ -83,14 +83,27 @@ const number = {
   </div>
 
   {/* A strip of work areas that drifts sideways. The second copy only exists
-      to make the loop seamless and is hidden from assistive technology. */}
-  <div class="ticker">
-    <ul class="ticker__track" aria-label="What I work on">
-      {ticker.map((item) => <li>{item}</li>)}
-    </ul>
-    <ul class="ticker__track" aria-hidden="true">
-      {ticker.map((item) => <li>{item}</li>)}
-    </ul>
+      to make the loop seamless and is hidden from assistive technology. The
+      button beside it stops the drift; it needs script and motion, so it is
+      hidden without either. */}
+  <div class="ticker-bar" data-ticker>
+    <div class="ticker">
+      <ul class="ticker__track" aria-label="What I work on">
+        {ticker.map((item) => <li>{item}</li>)}
+      </ul>
+      <ul class="ticker__track" aria-hidden="true">
+        {ticker.map((item) => <li>{item}</li>)}
+      </ul>
+    </div>
+    <button type="button" class="ticker__toggle" aria-pressed="false" data-ticker-toggle hidden>
+      <span class="visually-hidden">Pause the scrolling list</span>
+      <svg class="ticker__icon ticker__icon--pause" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M3.5 2h3v12h-3zM9.5 2h3v12h-3z" />
+      </svg>
+      <svg class="ticker__icon ticker__icon--play" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M4 2l10 6-10 6z" />
+      </svg>
+    </button>
   </div>
 
   <section id="work" class="band" aria-labelledby="work-title">
@@ -240,6 +253,21 @@ const number = {
     </div>
   </section>
 </Base>
+
+<script>
+  // The button that stops the ticker. The strip itself works without script;
+  // the button is revealed here and does nothing but flip `data-paused`.
+  const bar = document.querySelector<HTMLElement>('[data-ticker]');
+  const toggle = bar?.querySelector<HTMLButtonElement>('[data-ticker-toggle]');
+  if (bar && toggle) {
+    toggle.hidden = false;
+    toggle.addEventListener('click', () => {
+      const paused = toggle.getAttribute('aria-pressed') !== 'true';
+      toggle.setAttribute('aria-pressed', String(paused));
+      bar.toggleAttribute('data-paused', paused);
+    });
+  }
+</script>
 
 <style>
   /* Hero ----------------------------------------------------------------- */
@@ -489,11 +517,17 @@ const number = {
 
   /* Ticker ----------------------------------------------------------------- */
 
+  .ticker-bar {
+    display: flex;
+    border-block: var(--hairline) solid var(--border);
+  }
+
   .ticker {
+    flex: 1;
+    min-width: 0;
     display: flex;
     gap: var(--s-6);
     padding-block: var(--s-3);
-    border-block: var(--hairline) solid var(--border);
     overflow: hidden;
     user-select: none;
   }
@@ -531,7 +565,7 @@ const number = {
       animation: ticker 48s linear infinite;
     }
 
-    .ticker:focus-within .ticker__track {
+    .ticker-bar[data-paused] .ticker__track {
       animation-play-state: paused;
     }
   }
@@ -542,8 +576,60 @@ const number = {
     }
   }
 
-  /* Without motion the strip is a plain wrapped list. */
+  /* The pause button: a quiet icon at the end of the strip, 44px square so a
+     finger can hit it. Shown only when script runs (it removes `hidden`). */
+  .ticker__toggle {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    padding: 0;
+    border: 0;
+    border-inline-start: var(--hairline) solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    transition:
+      color var(--dur) var(--ease),
+      transform var(--dur-press) var(--ease-out);
+  }
+
+  .ticker__toggle[hidden] {
+    display: none;
+  }
+
+  .ticker__toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -4px;
+    color: var(--text);
+  }
+
+  .ticker__icon--play,
+  .ticker__toggle[aria-pressed='true'] .ticker__icon--pause {
+    display: none;
+  }
+
+  .ticker__toggle[aria-pressed='true'] .ticker__icon--play {
+    display: block;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ticker__toggle:hover {
+      color: var(--text);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ticker__toggle:active {
+      transform: scale(0.9);
+    }
+  }
+
+  /* Without motion the strip is a plain wrapped list, so nothing to pause. */
   @media (prefers-reduced-motion: reduce) {
+    .ticker__toggle {
+      display: none !important;
+    }
+
     .ticker {
       padding-inline: var(--gutter);
     }
