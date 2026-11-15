@@ -1,0 +1,330 @@
+/* The terminal window on the home page. Global (not scoped) because the
+   script adds output lines at runtime. Everything is namespaced. */
+
+.terminal {
+  --term-pad: var(--s-2);
+  position: relative;
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-variant-ligatures: none;
+  line-height: 1.7;
+  overflow: hidden;
+  transition: border-color 120ms var(--ease);
+}
+
+/* Focus style for the prompt: the window frame takes the accent. */
+.terminal:has(.term-input:focus-visible) {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    var(--shadow);
+}
+
+/* Title bar */
+
+.terminal__bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--s-2);
+  height: 2.5rem;
+  padding-inline: var(--term-pad);
+  border-block-end: var(--hairline) solid var(--border);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1;
+}
+
+.terminal__dots {
+  display: flex;
+  gap: 0.4375rem;
+}
+
+.terminal__dots i {
+  width: 0.625rem;
+  height: 0.625rem;
+  border: var(--hairline) solid var(--border-strong);
+  border-radius: 50%;
+}
+
+.terminal__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal__skip {
+  justify-self: end;
+  min-height: 2rem;
+  margin-inline-end: calc(var(--s-1) * -1);
+  padding: 0 var(--s-1);
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.terminal__skip:hover {
+  color: var(--text);
+}
+
+/* Output */
+
+.terminal__screen {
+  max-height: min(34rem, 70vh);
+  max-height: min(34rem, 70svh);
+  padding: var(--term-pad) var(--term-pad) 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.terminal__screen:focus-visible {
+  outline-offset: -3px;
+  border-radius: var(--radius);
+}
+
+.term-entry {
+  margin-block-end: var(--s-2);
+}
+
+.term-line {
+  display: flex;
+  gap: 1ch;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.term-prompt {
+  flex: none;
+  color: var(--accent);
+  font-weight: 600;
+  user-select: none;
+}
+
+.term-cmd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.term-out {
+  margin-block-start: 0.125rem;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.term-out p {
+  max-width: 78ch;
+}
+
+.term-out a {
+  font-weight: 500;
+}
+
+.term-out strong {
+  font-weight: 600;
+}
+
+.term-text > p + p {
+  margin-block-start: var(--s-1);
+}
+
+.term-text a + a {
+  margin-inline-start: 2ch;
+}
+
+.term-dim {
+  color: var(--muted);
+}
+
+.term-error {
+  color: var(--text);
+}
+
+.term-ls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 3ch;
+}
+
+.term-list > li + li {
+  margin-block-start: var(--s-1);
+}
+
+.term-list + p,
+.term-dl + p {
+  margin-block-start: var(--s-1);
+}
+
+.term-dl > div {
+  display: grid;
+  grid-template-columns: 10ch minmax(0, 1fr);
+  gap: 0 2ch;
+}
+
+.term-dl dt {
+  color: var(--muted);
+}
+
+.term-dl--help > div {
+  grid-template-columns: 1fr;
+  margin-block-end: 0.25rem;
+}
+
+.term-dl--help dt {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.term-dl--help dd {
+  color: var(--muted);
+}
+
+/* Cursor: a block while the intro types and while the prompt is idle. The
+   native caret takes over once the input has focus. */
+
+.term-cursor {
+  flex: none;
+  width: 0.6em;
+  height: 1.15em;
+  background: var(--accent);
+}
+
+.term-line .term-cursor {
+  align-self: center;
+  margin-inline-start: -1ch;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .term-cursor {
+    animation: term-blink 1.1s steps(1, end) infinite;
+  }
+}
+
+@keyframes term-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Prompt */
+
+.terminal__nojs {
+  padding: 0 var(--term-pad) var(--term-pad);
+  color: var(--muted);
+}
+
+.js .terminal__nojs,
+html:not(.js) .terminal__chips,
+html:not(.js) .terminal__prompt {
+  display: none;
+}
+
+.terminal__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+  padding: var(--s-1) var(--term-pad) 0;
+}
+
+.term-chip {
+  min-height: 2.5rem;
+  padding: 0 0.875rem;
+  border: var(--hairline) solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  line-height: 1;
+}
+
+.term-chip:hover {
+  border-color: var(--text);
+}
+
+.term-chip:focus-visible {
+  border-radius: var(--radius);
+}
+
+.terminal__prompt {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  padding: var(--s-1) var(--term-pad) calc(var(--term-pad) - 0.25rem);
+}
+
+.terminal__prompt .term-prompt {
+  cursor: text;
+}
+
+.term-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 2.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  caret-color: var(--accent);
+  font-family: inherit;
+  /* 16px stops iOS zooming the page when the input takes focus. */
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.term-input::placeholder {
+  color: var(--muted);
+  font-weight: 400;
+  opacity: 1;
+}
+
+/* Show the block cursor only while the prompt is empty and unfocused. */
+.terminal__prompt:focus-within .term-cursor,
+.terminal__prompt:has(.term-input:not(:placeholder-shown)) .term-cursor {
+  display: none;
+}
+
+/* Intro: lines stay hidden (but keep their space) until they are typed. */
+
+.intro-pending [data-term-intro],
+.term-wait {
+  visibility: hidden;
+}
+
+/* Larger screens: keyboard first, so the chips are not needed. */
+
+@media (min-width: 48rem) {
+  .terminal {
+    --term-pad: var(--s-3);
+    font-size: 0.875rem;
+  }
+
+  .term-dl--help > div {
+    grid-template-columns: 21ch minmax(0, 1fr);
+    margin-block-end: 0;
+  }
+
+  .term-input {
+    min-height: 2rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 48rem) and (hover: hover) and (pointer: fine) {
+  .terminal__chips {
+    display: none;
+  }
+}

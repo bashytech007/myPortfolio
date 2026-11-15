@@ -1,0 +1,197 @@
+import { commands, type Shell } from './commands';
+import { complete } from './complete';
+import { playIntro } from './intro';
+
+const HISTORY_KEY = 'term-history';
+const HISTORY_LIMIT = 50;
+
+function loadHistory(): string[] {
+  try {
+    const saved: unknown = JSON.parse(sessionStorage.getItem(HISTORY_KEY) ?? '[]');
+    return Array.isArray(saved) ? saved.filter((line): line is string => typeof line === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+export function initTerminal(): void {
+  const root = document.querySelector<HTMLElement>('[data-terminal]');
+  const screen = root?.querySelector<HTMLElement>('[data-term-screen]');
+  const session = root?.querySelector<HTMLElement>('[data-term-session]');
+  const log = root?.querySelector<HTMLElement>('[data-term-log]');
+  const form = root?.querySelector<HTMLFormElement>('[data-term-form]');
+  const input = root?.querySelector<HTMLInputElement>('[data-term-input]');
+  if (!root || !screen || !session || !log || !form || !input) return;
+
+  const history = loadHistory();
+  let historyIndex = history.length;
+  let draft = '';
+  let output: HTMLElement | null = null;
+
+  const files = [...root.querySelectorAll<HTMLTemplateElement>('template[data-file]')].map(
+    (template) => template.dataset.file ?? '',
+  );
+
+  let sections: Record<string, string> = {};
+  try {
+    sections = JSON.parse(root.dataset.sections ?? '{}');
+  } catch {
+    sections = {};
+  }
+
+  const scrollToEnd = () => {
+    screen.scrollTop = screen.scrollHeight;
+  };
+
+  const shell: Shell = {
+    files,
+    sections,
+    history,
+
+    // Typed input only ever reaches the page through textContent.
+    print(text, className) {
+      const line = document.createElement('p');
+      if (className) line.className = className;
+      line.textContent = text;
+      output?.append(line);
+    },
+
+    printTemplate(selector) {
+      const template = root.querySelector<HTMLTemplateElement>(selector);
+      if (!template) return false;
+      output?.append(template.content.cloneNode(true));
+      return true;
+    },
+
+    clear() {
+      session.hidden = true;
+      log.replaceChildren();
+      output = null;
+    },
+
+    navigate(href) {
+      const url = new URL(href, location.href);
+      if (url.origin !== location.origin) return;
+      if (url.pathname === location.pathname && url.hash) {
+        const target = document.getElementById(url.hash.slice(1));
+        if (target) {
+          window.history.replaceState(null, '', url.hash);
+          target.scrollIntoView();
+          return;
+        }
+      }
+      // Leave the line on screen for a moment before the page changes.
+      window.setTimeout(() => location.assign(url.href), 250);
+    },
+  };
+
+  const run = async (line: string): Promise<void> => {
+    const text = line.trim();
+
+    const entry = document.createElement('div');
+    entry.className = 'term-entry';
+
+    const echo = document.createElement('p');
+    echo.className = 'term-line';
+    const prompt = document.createElement('span');
+    prompt.className = 'term-prompt';
+    prompt.setAttribute('aria-hidden', 'true');
+    prompt.textContent = '$';
+    const typed = document.createElement('span');
+    typed.className = 'term-cmd';
+    typed.textContent = text;
+    echo.append(prompt, typed);
+
+    const out = document.createElement('div');
+    out.className = 'term-out';
+    entry.append(echo, out);
+    log.append(entry);
+    output = out;
+
+    if (text) {
+      if (history.at(-1) !== text) history.push(text);
+      if (history.length > HISTORY_LIMIT) history.splice(0, history.length - HISTORY_LIMIT);
+      try {
+        sessionStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      } catch {
+        // History is kept in memory only when storage is blocked.
+      }
+
+      const [name = '', ...args] = text.split(/\s+/);
+      const command = Object.hasOwn(commands, name.toLowerCase()) ? commands[name.toLowerCase()] : undefined;
+      if (command) {
+        try {
+          await command.run(args, shell);
+        } catch {
+          shell.print(`${name}: something went wrong`, 'term-error');
+        }
+      } else {
+        shell.print(`command not found: ${name}. Type help for a list.`, 'term-error');
+      }
+    }
+
+    historyIndex = history.length;
+    draft = '';
+    scrollToEnd();
+  };
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const line = input.value;
+    input.value = '';
+    void run(line);
+  });
+
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      if (history.length === 0) return;
+      event.preventDefault();
+      if (historyIndex === history.length) draft = input.value;
+      historyIndex = Math.max(0, Math.min(history.length, historyIndex + (event.key === 'ArrowUp' ? -1 : 1)));
+      input.value = historyIndex === history.length ? draft : (history[historyIndex] ?? '');
+      input.setSelectionRange(input.value.length, input.value.length);
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      input.value = '';
+      return;
+    }
+
+    // Tab completes only when there is something to complete, so an empty
+    // prompt never traps keyboard focus inside the terminal.
+    if (event.key === 'Tab' && !event.shiftKey && input.value.trim() !== '') {
+      event.preventDefault();
+      const result = complete(input.value, shell);
+      input.value = result.value;
+      if (result.options.length > 1) {
+        const entry = document.createElement('div');
+        entry.className = 'term-entry';
+        const options = document.createElement('p');
+        options.className = 'term-dim';
+        options.textContent = result.options.join('   ');
+        entry.append(options);
+        log.append(entry);
+        scrollToEnd();
+      }
+    }
+  });
+
+  // Command chips, for touch screens.
+  root.querySelector('[data-term-chips]')?.addEventListener('click', (event) => {
+    const chip = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-run]');
+    if (chip?.dataset.run) void run(chip.dataset.run);
+  });
+
+  // With a mouse, clicking anywhere in the window focuses the prompt, unless
+  // the click was on a link or was the end of a text selection.
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    screen.addEventListener('click', (event) => {
+      if ((event.target as HTMLElement).closest('a, button')) return;
+      if (!window.getSelection()?.isCollapsed) return;
+      input.focus({ preventScroll: true });
+    });
+  }
+
+  playIntro(root);
+}

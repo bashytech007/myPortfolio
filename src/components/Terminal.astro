@@ -1,0 +1,306 @@
+---
+/**
+ * The home page terminal.
+ *
+ * Everything it can print is rendered here at build time: the session shown
+ * on load is ordinary HTML, and the output of every other command sits in a
+ * <template>. The script (src/scripts/terminal) only clones those templates,
+ * so no content is fetched or built from strings in the browser.
+ */
+import '../styles/terminal.css';
+import { formatDate, isExternal, type Project, type Writeup } from '../lib/content';
+import { links, sections, site } from '../lib/site';
+
+interface Props {
+  projects: Project[];
+  writeups: Writeup[];
+}
+
+const { projects, writeups } = Astro.props;
+
+// The terminal lists the main builds only; /projects has the full list.
+const listed = projects.filter((p) => !p.data.draft && (p.data.featured || p.data.kind === 'security'));
+
+const projectFiles = listed.map((p) => `${p.id}.md`);
+const writeupFiles = writeups.map((w) => `${w.id}.md`);
+const rootFiles = ['about.txt', 'contact.txt', 'focus.txt', 'projects/', 'writeups/'];
+const contactLinks = [...links.contact, ...links.social];
+
+const help: [string, string][] = [
+  ['help', 'show this list'],
+  ['whoami', 'who this site belongs to'],
+  ['ls [dir]', 'list files'],
+  ['cat <file>', 'print a file, for example: cat about.txt'],
+  ['cd <section>', 'go to projects, writeups, security or contact'],
+  ['projects', 'list projects'],
+  ['writeups', 'list write-ups'],
+  ['contact', 'how to reach me'],
+  ['theme [dark|light]', 'switch colour theme'],
+  ['clear', 'clear the screen'],
+  ['chat', 'coming soon'],
+  ['submit <flag>', 'check a flag, if you found one'],
+];
+
+const chips = ['help', 'projects', 'writeups', 'contact', 'theme', 'clear'];
+---
+
+<section class="terminal" aria-label="Terminal" data-terminal data-sections={JSON.stringify(sections)}>
+  <div class="terminal__bar">
+    <span class="terminal__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <p class="terminal__title">visitor@{site.handle}: ~</p>
+    <button type="button" class="terminal__skip" data-term-skip hidden>Skip intro</button>
+  </div>
+
+  <div class="terminal__screen" data-term-screen tabindex="0" role="group" aria-label="Terminal output">
+    <div data-term-session>
+      <div class="term-entry" data-term-intro>
+        <p class="term-line">
+          <span class="term-prompt" aria-hidden="true">$</span>
+          <span class="visually-hidden">Command:</span>
+          <span class="term-cmd">whoami</span>
+        </p>
+        <div class="term-out">
+          <p>{site.whoami}</p>
+        </div>
+      </div>
+
+      <div class="term-entry" data-term-intro>
+        <p class="term-line">
+          <span class="term-prompt" aria-hidden="true">$</span>
+          <span class="visually-hidden">Command:</span>
+          <span class="term-cmd">cat about.txt</span>
+        </p>
+        <div class="term-out term-text">
+          {site.about.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+      </div>
+
+      <div class="term-entry" data-term-intro>
+        <p class="term-line">
+          <span class="term-prompt" aria-hidden="true">$</span>
+          <span class="visually-hidden">Command:</span>
+          <span class="term-cmd">ls projects/</span>
+        </p>
+        <div class="term-out">
+          <ul class="term-ls">
+            {projectFiles.map((file) => <li>{file}</li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="terminal__log" data-term-log role="log" aria-label="Command output"></div>
+  </div>
+
+  <p class="terminal__nojs">
+    The live prompt needs JavaScript. Everything it prints is also on this page and in the navigation
+    above.
+  </p>
+
+  <div class="terminal__chips" data-term-chips role="group" aria-label="Run a command">
+    {
+      chips.map((command) => (
+        <button type="button" class="term-chip" data-run={command}>
+          {command}
+        </button>
+      ))
+    }
+  </div>
+
+  <form class="terminal__prompt" data-term-form>
+    <label class="term-prompt" for="term-input">
+      <span aria-hidden="true">$</span>
+      <span class="visually-hidden">Terminal command. Type help for a list.</span>
+    </label>
+    <span class="term-cursor" aria-hidden="true"></span>
+    <input
+      id="term-input"
+      class="term-input"
+      data-term-input
+      type="text"
+      name="command"
+      placeholder="type help and press Enter"
+      autocomplete="off"
+      autocapitalize="none"
+      autocorrect="off"
+      spellcheck="false"
+      enterkeyhint="go"
+      maxlength="200"
+    />
+  </form>
+
+  {/* Command output, cloned by the script. */}
+  <template data-out="help">
+    <dl class="term-dl term-dl--help">
+      {
+        help.map(([usage, description]) => (
+          <div>
+            <dt>{usage}</dt>
+            <dd>{description}</dd>
+          </div>
+        ))
+      }
+    </dl>
+    <p class="term-dim">Tab completes a command. Up and down arrows step through history.</p>
+  </template>
+
+  <template data-out="whoami">
+    <p>{site.whoami}</p>
+  </template>
+
+  <template data-out="chat">
+    <p>Coming soon.</p>
+  </template>
+
+  <template data-out="ls:">
+    <ul class="term-ls">
+      {rootFiles.map((file) => <li>{file}</li>)}
+    </ul>
+  </template>
+
+  <template data-out="ls:-a">
+    <ul class="term-ls">
+      {['.notes', ...rootFiles].map((file) => <li>{file}</li>)}
+    </ul>
+  </template>
+
+  <template data-out="ls:projects">
+    <ul class="term-ls">
+      {projectFiles.map((file) => <li>{file}</li>)}
+    </ul>
+  </template>
+
+  <template data-out="ls:writeups">
+    {
+      writeupFiles.length > 0 ? (
+        <ul class="term-ls">
+          {writeupFiles.map((file) => (
+            <li>{file}</li>
+          ))}
+        </ul>
+      ) : (
+        <p class="term-dim">No write-ups published yet.</p>
+      )
+    }
+  </template>
+
+  <template data-out="projects">
+    <ul class="term-list">
+      {
+        listed.map((p) => (
+          <li>
+            <a href={p.data.live ?? '/projects'} rel={p.data.live && isExternal(p.data.live) ? 'noopener noreferrer' : undefined}>
+              {p.data.title}
+            </a>
+            <span class="term-dim">[{p.data.kind}]</span>
+            <p>{p.data.summary}</p>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="term-dim">Full list: <a href="/projects">/projects</a></p>
+  </template>
+
+  <template data-out="writeups">
+    {
+      writeups.length > 0 ? (
+        <ul class="term-list">
+          {writeups.map((w) => (
+            <li>
+              <a href={`/writeups/${w.id}`}>{w.data.title}</a>
+              <span class="term-dim">{formatDate(w.data.date)}</span>
+              <p>{w.data.summary}</p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No write-ups published yet.</p>
+      )
+    }
+    <p class="term-dim">All write-ups: <a href="/writeups">/writeups</a></p>
+  </template>
+
+  <template data-out="contact" data-file="contact.txt">
+    <dl class="term-dl">
+      {
+        contactLinks.map((item) => (
+          <div>
+            <dt>{item.label.toLowerCase()}</dt>
+            <dd>
+              <a href={item.href} rel="noopener noreferrer">
+                {item.text}
+              </a>
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </template>
+
+  <template data-file="about.txt">
+    <div class="term-text">
+      {site.about.map((paragraph) => <p>{paragraph}</p>)}
+    </div>
+  </template>
+
+  <template data-file="focus.txt">
+    <ul class="term-list">
+      {
+        site.focus.map((item) => (
+          <li>
+            <strong>{item.title}</strong>
+            <p>{item.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </template>
+
+  {
+    listed.map((p) => (
+      <template data-file={`projects/${p.id}.md`}>
+        <div class="term-text">
+          <p>
+            <strong>{p.data.title}</strong> <span class="term-dim">[{p.data.kind}]</span>
+          </p>
+          <p>{p.data.summary}</p>
+          {p.data.tags.length > 0 && <p class="term-dim">{p.data.tags.join(', ')}</p>}
+          <p>
+            {p.data.live && (
+              <a href={p.data.live} rel={isExternal(p.data.live) ? 'noopener noreferrer' : undefined}>
+                {p.data.liveLabel}
+              </a>
+            )}
+            {p.data.source && (
+              <a href={p.data.source} rel="noopener noreferrer">
+                Source
+              </a>
+            )}
+          </p>
+        </div>
+      </template>
+    ))
+  }
+
+  {
+    writeups.map((w) => (
+      <template data-file={`writeups/${w.id}.md`}>
+        <div class="term-text">
+          <p>
+            <strong>{w.data.title}</strong> <span class="term-dim">{formatDate(w.data.date)}</span>
+          </p>
+          <p>{w.data.summary}</p>
+          <p>
+            <a href={`/writeups/${w.id}`}>Read the write-up</a>
+          </p>
+        </div>
+      </template>
+    ))
+  }
+</section>
+
+<script>
+  import { initTerminal } from '../scripts/terminal';
+
+  initTerminal();
+</script>

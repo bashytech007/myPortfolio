@@ -1,11 +1,270 @@
 ---
 import Base from '../layouts/Base.astro';
-import { site } from '../lib/site';
+import ProjectCard from '../components/ProjectCard.astro';
+import Terminal from '../components/Terminal.astro';
+import WriteupList from '../components/WriteupList.astro';
+import { getProjects, getWriteups } from '../lib/content';
+import { links, site } from '../lib/site';
+
+const projects = await getProjects();
+const writeups = await getWriteups();
+const featured = projects.filter((p) => p.data.featured);
+const latestWriteups = writeups.slice(0, 2);
+const contactLinks = [...links.contact, ...links.social];
 ---
 
 <Base>
-  <div class="container page-head">
-    <h1>{site.headline}</h1>
+  <section class="container hero" aria-labelledby="hero-title">
+    <p class="hero__id">
+      <span class="hero__name">{site.name}</span>
+      <span class="label">{site.role}</span>
+    </p>
+    <h1 id="hero-title">{site.headline}</h1>
     <p class="lead">{site.intro}</p>
+    <p class="hero__actions">
+      <a class="btn btn--primary" href="/writeups">View write-ups</a>
+      <a class="btn" href="#contact">Contact</a>
+    </p>
+  </section>
+
+  <div class="container hero__terminal">
+    <Terminal projects={projects} writeups={writeups} />
   </div>
+
+  <section id="work" class="container section" aria-labelledby="work-title" data-reveal>
+    <div class="section-head">
+      <h2 id="work-title">Featured work</h2>
+      <a class="text-link" href="/projects">All projects</a>
+    </div>
+
+    {
+      latestWriteups.length > 0 ? (
+        <div class="work__writeups">
+          <div class="work__subhead">
+            <p class="label">Latest write-ups</p>
+            <a class="text-link" href="/writeups">
+              All write-ups
+            </a>
+          </div>
+          <WriteupList writeups={latestWriteups} level={3} />
+        </div>
+      ) : (
+        <p class="work__note">
+          Security case studies will be listed under <a href="/writeups">write-ups</a> as I publish
+          them. Until then, these are builds from my time as a developer.
+        </p>
+      )
+    }
+
+    {latestWriteups.length > 0 && <p class="label work__builds">Builds</p>}
+    <div class="project-grid">
+      {featured.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </section>
+
+  <section id="focus" class="container section focus" aria-labelledby="focus-title" data-reveal>
+    <div class="focus__head">
+      <h2 id="focus-title">Focus areas</h2>
+      <p>{site.focusIntro}</p>
+    </div>
+    <ol class="rows focus__list">
+      {
+        site.focus.map((item, i) => (
+          <li>
+            <span class="label label--accent" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <div>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section id="contact" class="container section contact" aria-labelledby="contact-title" data-reveal>
+    <div class="contact__head">
+      <h2 id="contact-title">Contact</h2>
+      <p>{site.contactIntro}</p>
+      <p>Based in {site.location}.</p>
+    </div>
+    <ul class="rows contact__list">
+      {
+        contactLinks.map((item) => (
+          <li>
+            <a href={item.href} rel="me noopener noreferrer">
+              <span class="label">{item.label}</span>
+              <span class="contact__value">{item.text}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
 </Base>
+
+<style>
+  /* Hero */
+
+  .hero {
+    padding-block-start: var(--s-8);
+  }
+
+  .hero__id {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-block-end: var(--s-3);
+  }
+
+  .hero__name {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .hero h1 {
+    max-width: 22ch;
+  }
+
+  .hero .lead {
+    margin-block-start: var(--s-3);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-block-start: var(--s-4);
+  }
+
+  .hero__terminal {
+    margin-block-start: var(--s-6);
+  }
+
+  @media (min-width: 30rem) {
+    .hero__id {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--s-2);
+    }
+
+    .hero__id .label {
+      padding-inline-start: var(--s-2);
+      border-inline-start: var(--hairline) solid var(--border-strong);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .hero {
+      padding-block-start: var(--s-10);
+    }
+
+    .hero .lead {
+      margin-block-start: var(--s-4);
+    }
+
+    .hero__actions {
+      margin-block-start: var(--s-5);
+    }
+
+    .hero__terminal {
+      margin-block-start: var(--s-6);
+    }
+  }
+
+  /* Featured work */
+
+  .work__note {
+    max-width: var(--measure);
+    margin-block: calc(var(--s-3) * -1) var(--s-5);
+    color: var(--muted);
+  }
+
+  .work__writeups {
+    margin-block-end: var(--s-6);
+  }
+
+  .work__subhead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-2);
+    margin-block-end: var(--s-2);
+  }
+
+  .work__builds {
+    margin-block-end: var(--s-2);
+  }
+
+  /* Focus areas and contact share a two-column layout on wide screens. */
+
+  .focus,
+  .contact {
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .focus__head p,
+  .contact__head p {
+    max-width: 26em;
+    margin-block-start: var(--s-2);
+    color: var(--muted);
+  }
+
+  .contact__head p + p {
+    margin-block-start: var(--s-1);
+  }
+
+  .focus__list li {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: var(--s-2);
+    padding-block: var(--s-4);
+  }
+
+  .focus__list .label {
+    line-height: 1.625rem;
+  }
+
+  .focus__list p {
+    max-width: var(--measure);
+    margin-block-start: var(--s-1);
+    color: var(--muted);
+  }
+
+  .contact__list a {
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: var(--s-2);
+    padding-block: 1.125rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .contact__value {
+    overflow-wrap: anywhere;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--border-strong);
+    transition: text-decoration-color 120ms var(--ease);
+  }
+
+  .contact__list a:hover .contact__value {
+    color: var(--accent);
+    text-decoration-color: currentColor;
+  }
+
+  @media (min-width: 60rem) {
+    .focus,
+    .contact {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--s-8);
+      align-items: start;
+    }
+  }
+</style>

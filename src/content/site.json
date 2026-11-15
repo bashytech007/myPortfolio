@@ -5,15 +5,15 @@
   "employer": "TraceWorka Innovative Solutions",
   "location": "Lagos, Nigeria",
   "headline": "I test web apps, APIs and AI agents the way an attacker would.",
-  "intro": "I'm an application security engineer at TraceWorka Innovative Solutions, where I've done web and API penetration testing since March 2025. Before that I built web apps as a full-stack developer.",
+  "intro": "Application security engineer at TraceWorka Innovative Solutions since March 2025, and a full-stack developer before that. I also do AI red teaming and bug bounty recon.",
   "description": "Bashir Aremu is an application security engineer working on web and API penetration testing, AI red teaming and bug bounty recon.",
-  "whoami": "Bashir Aremu, application security engineer. Web and API pentesting, AI red teaming, bug bounty recon.",
+  "whoami": "Bashir Aremu, application security engineer.",
   "about": [
-    "I'm an application security engineer at TraceWorka Innovative Solutions. Since March 2025 my job has been penetration testing web applications and APIs.",
+    "I test web applications and APIs for security flaws at TraceWorka Innovative Solutions, where I've worked since March 2025.",
     "Before that I was a full-stack developer, so I know how these systems get built and where the shortcuts usually are.",
-    "Outside the day job I do AI red teaming (prompt injection and agent security) and recon for bug bounty programs."
+    "I also do AI red teaming (prompt injection and agent security) and recon for bug bounty programs."
   ],
-  "focusIntro": "Three kinds of work, in the order I spend time on them.",
+  "focusIntro": "The three kinds of security work I do.",
   "focus": [
     {
       "id": "web-api",
