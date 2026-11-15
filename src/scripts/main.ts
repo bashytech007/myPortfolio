@@ -1,7 +1,9 @@
 import { initThemeControls } from './theme';
 import { initReveal } from './reveal';
+import { initNav } from './nav';
 
 initThemeControls();
+initNav();
 initReveal();
 
 // Code blocks that scroll sideways must be reachable from the keyboard.

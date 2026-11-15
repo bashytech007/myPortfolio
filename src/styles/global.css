@@ -164,7 +164,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  scroll-padding-top: var(--s-4);
+  scroll-padding-top: calc(var(--header-h) + var(--s-3));
   background: var(--bg);
 }
 
@@ -392,7 +392,7 @@ samp {
   position: absolute;
   inset-block-start: var(--s-1);
   inset-inline-start: var(--s-1);
-  z-index: 10;
+  z-index: 30;
   padding: var(--s-1) var(--s-2);
   border-radius: var(--radius);
   background: var(--accent);
@@ -566,7 +566,7 @@ samp {
 .prose h2 {
   margin-block-start: var(--s-8);
   font-size: clamp(1.5rem, 1.3rem + 0.8vw, 1.875rem);
-  scroll-margin-top: var(--s-4);
+  scroll-margin-top: calc(var(--header-h) + var(--s-3));
 }
 
 .prose h3 {

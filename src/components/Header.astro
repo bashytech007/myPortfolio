@@ -6,7 +6,7 @@ const isCurrent = (href: string) =>
   !href.includes('#') && (path === href || path.startsWith(`${href}/`));
 ---
 
-<header class="site-header">
+<header class="site-header" data-site-header>
   <div class="container site-header__inner">
     <a class="brand" href="/" aria-current={path === '/' ? 'page' : undefined}>
       <svg class="brand__mark" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
@@ -43,8 +43,30 @@ const isCurrent = (href: string) =>
 </header>
 
 <style>
+  /* Sticky. On phones the brand row scrolls away and the row of links stays;
+     from 40rem up the whole bar stays. --header-h is the part that stays. */
   .site-header {
-    border-block-end: var(--hairline) solid var(--border);
+    position: sticky;
+    inset-block-start: -3.5rem;
+    z-index: 20;
+    border-block-end: var(--hairline) solid transparent;
+    background: var(--bg);
+    transition: border-color 160ms var(--ease);
+  }
+
+  @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    .site-header {
+      background: color-mix(in srgb, var(--bg) 78%, transparent);
+      -webkit-backdrop-filter: saturate(1.5) blur(14px);
+      backdrop-filter: saturate(1.5) blur(14px);
+    }
+  }
+
+  /* The bottom edge appears once the page has scrolled. Without script it is
+     always there. */
+  .site-header[data-scrolled],
+  :global(html:not(.js)) .site-header {
+    border-block-end-color: var(--border);
   }
 
   .site-header__inner {
@@ -103,17 +125,28 @@ const isCurrent = (href: string) =>
   }
 
   .site-nav a:hover,
-  .site-nav a[aria-current='page'] {
+  .site-nav a[aria-current] {
     color: var(--text);
   }
 
-  .site-nav a[aria-current='page']::after {
+  /* Marks the current page, or the section on screen (set by script). */
+  .site-nav a::after {
     content: '';
     position: absolute;
     inset-inline: var(--s-1);
     inset-block-end: -1px;
     height: 2px;
     background: var(--accent);
+    opacity: 0;
+    transform: scaleX(0.4);
+    transition:
+      opacity 160ms var(--ease),
+      transform 160ms var(--ease);
+  }
+
+  .site-nav a[aria-current]::after {
+    opacity: 1;
+    transform: none;
   }
 
   .theme-toggle {
@@ -157,6 +190,10 @@ const isCurrent = (href: string) =>
   }
 
   @media (min-width: 40rem) {
+    .site-header {
+      inset-block-start: 0;
+    }
+
     .site-header__inner {
       grid-template-columns: 1fr auto auto;
       grid-template-areas: 'brand nav toggle';
