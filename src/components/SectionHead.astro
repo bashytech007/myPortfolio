@@ -1,0 +1,55 @@
+---
+/**
+ * The opening of a section: a rule, a small label (numbered on the home
+ * page), an optional link on the right, then the statement as the heading.
+ * Styles are in global.css (.section-head) so every page shares them.
+ */
+interface Props {
+  /** id for the heading, used by aria-labelledby on the section. */
+  id: string;
+  /** Short label, for example "Work". */
+  label: string;
+  /** The heading itself. */
+  title: string;
+  /** Position on the page, starting at 1. Omit for an unnumbered section. */
+  number?: number;
+  /** Link shown opposite the label. */
+  href?: string;
+  linkLabel?: string;
+  /** Smaller title, for groups inside a page. */
+  sub?: boolean;
+}
+
+const { id, label, title, number, href, linkLabel, sub = false } = Astro.props;
+---
+
+<header class:list={['section-head', { 'section-head--sub': sub }]}>
+  <div class="section-head__top">
+    <p class="label">
+      {
+        number !== undefined && (
+          <>
+            <span class="label--accent">{String(number).padStart(2, '0')}</span>
+            <span aria-hidden="true"> / </span>
+          </>
+        )
+      }
+      {label}
+    </p>
+    {
+      href && (
+        <a class="label arrow-link" href={href}>
+          {linkLabel}
+        </a>
+      )
+    }
+  </div>
+  <h2 id={id} class="section-head__title">{title}</h2>
+  {
+    Astro.slots.has('default') && (
+      <div class="section-head__intro">
+        <slot />
+      </div>
+    )
+  }
+</header>
