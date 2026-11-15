@@ -54,6 +54,7 @@ export const commands: Record<string, Command> = {
   // Portfolio
   whoami: { run: fromTemplate('whoami') },
   about: { run: fromFile('about.txt') },
+  experience: { run: fromFile('experience.txt') },
   focus: { run: fromFile('focus.txt') },
   projects: { run: fromTemplate('projects') },
   writeups: { run: fromTemplate('writeups') },

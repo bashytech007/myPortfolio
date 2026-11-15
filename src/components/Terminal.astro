@@ -12,7 +12,7 @@ import pkg from '../../package.json';
 import vercel from '../../vercel.json';
 import { drawBanner } from '../lib/banner';
 import { formatDate, isExternal, type Project, type Writeup } from '../lib/content';
-import { links, sections, site } from '../lib/site';
+import { experience, formatMonth, links, sections, site } from '../lib/site';
 import { FLAG_COUNT } from '../scripts/terminal/flags';
 
 interface Props {
@@ -27,7 +27,14 @@ const published = writeups.filter((w) => !w.data.draft);
 
 const projectFiles = listed.map((p) => `${p.id}.md`);
 const writeupFiles = writeups.map((w) => `${w.id}.md`);
-const rootFiles = ['about.txt', 'contact.txt', 'focus.txt', 'projects/', 'writeups/'];
+const rootFiles = [
+  'about.txt',
+  'contact.txt',
+  'experience.txt',
+  'focus.txt',
+  'projects/',
+  'writeups/',
+];
 const contactLinks = [...links.contact, ...links.social];
 const projectLinks = Object.fromEntries(
   listed.map((p) => [p.id, { title: p.data.title, href: p.data.live ?? null }]),
@@ -73,6 +80,7 @@ const help: { title: string; rows: [string, string][] }[] = [
     rows: [
       ['whoami', 'who this site belongs to'],
       ['about', 'the longer version'],
+      ['experience', 'where I work'],
       ['focus', 'the security work I do'],
       ['projects', 'list projects'],
       ['open <id>', "follow a project's live link"],
@@ -370,6 +378,22 @@ const chips = ['help', 'about', 'projects', 'writeups', 'contact', 'clear'];
     <div class="term-text">
       {site.about.map((paragraph) => <p>{paragraph}</p>)}
     </div>
+  </template>
+
+  <template data-file="experience.txt">
+    <ol class="term-list">
+      {
+        experience.map((job) => (
+          <li>
+            <span class="term-dim">
+              {formatMonth(job.start)} - {job.end ? formatMonth(job.end) : 'Present'}
+            </span>
+            <strong>{job.role}</strong>
+            <p>{job.org}</p>
+          </li>
+        ))
+      }
+    </ol>
   </template>
 
   <template data-file="focus.txt">
