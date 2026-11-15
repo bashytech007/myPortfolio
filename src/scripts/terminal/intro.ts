@@ -7,8 +7,8 @@
  *
  * Any key, click or the Skip button ends it immediately.
  */
-const STEP_MS = 90;
-const START_MS = 250;
+const STEP_MS = 35;
+const START_MS = 60;
 
 export function playIntro(terminal: HTMLElement, onDone: () => void): void {
   const page = document.documentElement;
