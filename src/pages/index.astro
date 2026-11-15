@@ -1,111 +1,168 @@
 ---
 import Base from '../layouts/Base.astro';
-import Icon, { type IconName } from '../components/Icon.astro';
 import ProjectCard from '../components/ProjectCard.astro';
-import Terminal from '../components/Terminal.astro';
+import SectionHead from '../components/SectionHead.astro';
 import WriteupList from '../components/WriteupList.astro';
 import { getProjects, getWriteups } from '../lib/content';
-import { links, site } from '../lib/site';
+import { links, site, terminal } from '../lib/site';
 
 const projects = await getProjects();
 const writeups = await getWriteups();
-const featured = projects.filter((p) => p.data.featured);
+// The home grid is screenshot-led, so it only takes projects that have one.
+const selected = projects.filter((p) => p.data.featured && p.data.image);
 const latestWriteups = writeups.slice(0, 2);
 const contactLinks = [...links.contact, ...links.social];
+const [firstName = site.name, ...restOfName] = site.name.split(' ');
+const ticker = [...site.disciplines, ...site.credentials.map((item) => item.label)];
+
+// Sections are numbered in the order they appear. Write-ups only take a
+// number once there is something to list.
+let count = 0;
+const next = () => (count += 1);
+const number = {
+  work: next(),
+  about: next(),
+  focus: next(),
+  writeups: latestWriteups.length > 0 ? next() : 0,
+  contact: next(),
+};
 ---
 
 <Base bodyClass="home">
   <div class="hero-band">
-    <div class="container hero">
-      <section class="hero__copy" aria-labelledby="hero-title">
-        <p class="hero__id">
-          <span class="hero__name">{site.name}</span>
-          <span class="label hero__disciplines">
-            {
-              site.disciplines.map((item, i) => (
-                <>
-                  {i > 0 && <span aria-hidden="true"> · </span>}
-                  <span class="hero__discipline">{item}</span>
-                  {i < site.disciplines.length - 1 && <span class="visually-hidden">, </span>}
-                </>
-              ))
-            }
-          </span>
-        </p>
-        <h1 id="hero-title">{site.headline}</h1>
-        <p class="lead">{site.intro}</p>
-        <p class="hero__actions">
-          <a class="btn btn--primary" href="/writeups">View write-ups</a>
-          <a class="btn" href="#contact">Contact</a>
-        </p>
-        <ul class="hero__chips" aria-label="What I work on">
-          {
-            site.credentials.map((item) => (
-              <li class="chip">
-                <Icon name={item.icon as IconName} />
-                {item.label}
-              </li>
-            ))
-          }
-        </ul>
-      </section>
+    <section class="container hero" aria-labelledby="hero-title">
+      <p class="label hero__roles">
+        {
+          site.roles.map((role, i) => (
+            <>
+              {i > 0 && <span class="hero__sep" aria-hidden="true"> / </span>}
+              <span class="hero__role">{role}</span>
+              {i < site.roles.length - 1 && <span class="visually-hidden">, </span>}
+            </>
+          ))
+        }
+      </p>
 
-      <div class="hero__terminal">
-        <Terminal projects={projects} writeups={writeups} />
+      <h1 id="hero-title" class="hero__name">
+        <span class="hero__line"><span class="hero__word">{firstName}</span></span>
+        {
+          restOfName.length > 0 && (
+            <span class="hero__line">
+              <span class="hero__word">
+                {restOfName.join(' ')}
+                <span class="hero__cursor" aria-hidden="true" />
+              </span>
+            </span>
+          )
+        }
+      </h1>
+
+      <div class="hero__foot">
+        <div class="hero__pitch">
+          <p class="hero__statement">{site.headline}</p>
+          <p class="hero__actions">
+            <a class="btn btn--primary" href="#work">View work</a>
+            <a class="btn" href={terminal.href}>
+              <span class="btn__glyph" aria-hidden="true">&gt;_</span>
+              Open the terminal
+            </a>
+          </p>
+        </div>
+        <dl class="hero__facts">
+          <div>
+            <dt class="label">Currently</dt>
+            <dd>{site.employer}</dd>
+          </div>
+          <div>
+            <dt class="label">Based in</dt>
+            <dd>{site.location}</dd>
+          </div>
+        </dl>
       </div>
-    </div>
+    </section>
   </div>
 
-  <section id="work" class="band band--alt" aria-labelledby="work-title">
-    <div class="container" data-reveal>
-      <div class="section-head">
-        <h2 id="work-title">Featured work</h2>
-        <a class="text-link" href="/projects">All projects</a>
+  {/* A strip of work areas that drifts sideways. The second copy only exists
+      to make the loop seamless and is hidden from assistive technology. */}
+  <div class="ticker">
+    <ul class="ticker__track" aria-label="What I work on">
+      {ticker.map((item) => <li>{item}</li>)}
+    </ul>
+    <ul class="ticker__track" aria-hidden="true">
+      {ticker.map((item) => <li>{item}</li>)}
+    </ul>
+  </div>
+
+  <section id="work" class="band" aria-labelledby="work-title">
+    <div class="container">
+      <SectionHead
+        id="work-title"
+        number={number.work}
+        label="Work"
+        title="Selected work"
+        href="/projects"
+        linkLabel="All projects"
+      >
+        {
+          latestWriteups.length === 0 && (
+            <p>
+              Security case studies will be listed under <a href="/writeups">write-ups</a> as I
+              publish them. Until then, this is the site itself and builds from my time as a
+              developer.
+            </p>
+          )
+        }
+      </SectionHead>
+
+      <div class="project-grid project-grid--stagger">
+        {
+          selected.map((project, i) => (
+            <ProjectCard project={project} number={i + 1} priority={i === 0} />
+          ))
+        }
       </div>
+    </div>
+  </section>
 
-      {
-        latestWriteups.length > 0 ? (
-          <div class="work__writeups">
-            <div class="work__subhead">
-              <p class="label">Latest write-ups</p>
-              <a class="text-link" href="/writeups">
-                All write-ups
-              </a>
-            </div>
-            <WriteupList writeups={latestWriteups} level={3} />
+  <section id="about" class="band" aria-labelledby="about-title">
+    <div class="container" data-reveal>
+      <SectionHead id="about-title" number={number.about} label="About" title={site.intro} />
+      <div class="about">
+        <dl class="about__facts">
+          {
+            site.roles.map((role, i) => (
+              <div>
+                <dt class="label">{i === 0 ? 'Role' : 'Also'}</dt>
+                <dd>{role}</dd>
+              </div>
+            ))
+          }
+          <div>
+            <dt class="label">Employer</dt>
+            <dd>{site.employer}</dd>
           </div>
-        ) : (
-          <p class="work__note">
-            Security case studies will be listed under <a href="/writeups">write-ups</a> as I publish
-            them. Until then, these are builds from my time as a developer.
-          </p>
-        )
-      }
-
-      {latestWriteups.length > 0 && <p class="label work__builds">Builds</p>}
-      <div class="project-grid">
-        {featured.map((project) => <ProjectCard project={project} />)}
+          <div>
+            <dt class="label">Location</dt>
+            <dd>{site.location}</dd>
+          </div>
+        </dl>
+        <div class="about__text">
+          {site.about.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
       </div>
     </div>
   </section>
 
   <section id="focus" class="band" aria-labelledby="focus-title">
-    <div class="container focus" data-reveal>
-      <div class="focus__head">
-        <h2 id="focus-title">Focus areas</h2>
-        <p>{site.focusIntro}</p>
-      </div>
-      <ol class="rows focus__list">
+    <div class="container" data-reveal>
+      <SectionHead id="focus-title" number={number.focus} label="Focus" title={site.focusIntro} />
+      <ol class="rows focus">
         {
           site.focus.map((item, i) => (
             <li>
-              <span class="label label--accent" aria-hidden="true">
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <div>
-                <h3>{item.title}</h3>
-                <p>{item.body}</p>
-              </div>
+              <span class="focus__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
             </li>
           ))
         }
@@ -113,20 +170,37 @@ const contactLinks = [...links.contact, ...links.social];
     </div>
   </section>
 
-  <section id="contact" class="band band--alt" aria-labelledby="contact-title">
-    <div class="container contact" data-reveal>
-      <div class="contact__head">
-        <h2 id="contact-title">Contact</h2>
+  {
+    latestWriteups.length > 0 && (
+      <section id="writeups" class="band" aria-labelledby="writeups-title">
+        <div class="container" data-reveal>
+          <SectionHead
+            id="writeups-title"
+            number={number.writeups}
+            label="Write-ups"
+            title="Latest write-ups"
+            href="/writeups"
+            linkLabel="All write-ups"
+          />
+          <WriteupList writeups={latestWriteups} level={3} />
+        </div>
+      </section>
+    )
+  }
+
+  <section id="contact" class="band" aria-labelledby="contact-title">
+    <div class="container" data-reveal>
+      <SectionHead id="contact-title" number={number.contact} label="Contact" title="Get in touch">
         <p>{site.contactIntro}</p>
-        <p>Based in {site.location}.</p>
-      </div>
-      <ul class="rows contact__list">
+      </SectionHead>
+      <ul class="rows contact">
         {
           contactLinks.map((item) => (
             <li>
               <a href={item.href} rel="me noopener noreferrer">
                 <span class="label">{item.label}</span>
                 <span class="contact__value">{item.text}</span>
+                <span class="contact__arrow" aria-hidden="true">&#8599;</span>
               </a>
             </li>
           ))
@@ -137,7 +211,7 @@ const contactLinks = [...links.contact, ...links.social];
 </Base>
 
 <style>
-  /* Hero */
+  /* Hero ----------------------------------------------------------------- */
 
   /* Full-width band so the grid can run edge to edge behind the content. */
   .hero-band {
@@ -156,52 +230,88 @@ const contactLinks = [...links.contact, ...links.social];
     background-image:
       linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
       linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-    background-size: 3.5rem 3.5rem;
+    background-size: 4rem 4rem;
     background-position: center top;
-    -webkit-mask-image: linear-gradient(to bottom, #000, rgb(0 0 0 / 0.55) 45%, transparent 94%);
-    mask-image: linear-gradient(to bottom, #000, rgb(0 0 0 / 0.55) 45%, transparent 94%);
+    -webkit-mask-image: linear-gradient(to bottom, #000, rgb(0 0 0 / 0.5) 50%, transparent 96%);
+    mask-image: linear-gradient(to bottom, #000, rgb(0 0 0 / 0.5) 50%, transparent 96%);
+    pointer-events: none;
+  }
+
+  /* One soft patch of the accent behind the name. A plain gradient, not a
+     blur filter, and it does not move. */
+  .hero-band::after {
+    content: '';
+    position: absolute;
+    inset: -30% -20% auto 35%;
+    z-index: -1;
+    height: 120%;
+    background: radial-gradient(closest-side, var(--glow), transparent);
     pointer-events: none;
   }
 
   .hero {
-    display: grid;
-    gap: var(--s-6);
-    padding-block: var(--s-5) var(--s-8);
-  }
-
-  .hero__copy {
-    min-width: 0;
-  }
-
-  .hero__id {
     display: flex;
     flex-direction: column;
-    gap: 0.375rem;
-    margin-block-end: var(--s-3);
+    justify-content: flex-end;
+    min-height: calc(100svh - var(--header-h));
+    padding-block: var(--s-8) var(--s-5);
   }
 
+  .hero__roles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .hero__sep {
+    display: none;
+  }
+
+  /* The name: heavy, uppercase, set tight, sized to the viewport. */
   .hero__name {
-    font-size: var(--text-lg);
-    font-weight: 600;
-    line-height: 1.3;
-    letter-spacing: -0.015em;
-  }
-
-  .hero__disciplines {
-    text-wrap: balance;
-  }
-
-  .hero__discipline {
-    white-space: nowrap;
-  }
-
-  .hero h1 {
-    max-width: 22ch;
-  }
-
-  .hero .lead {
     margin-block-start: var(--s-3);
-    color: var(--muted);
+    margin-inline-start: -0.04em;
+    font-size: var(--text-display);
+    font-weight: 800;
+    line-height: 0.84;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+    text-wrap: nowrap;
+  }
+
+  /* Each line is clipped so its word can rise into place. */
+  .hero__line {
+    display: block;
+    overflow: hidden;
+    overflow: clip;
+  }
+
+  .hero__word {
+    display: inline-block;
+  }
+
+  /* A block cursor after the name, the same idea as the mark in the header. */
+  .hero__cursor {
+    display: inline-block;
+    width: 0.4em;
+    height: 0.72em;
+    margin-inline-start: 0.1em;
+    background: var(--accent);
+  }
+
+  .hero__foot {
+    display: grid;
+    gap: var(--s-5);
+    margin-block-start: var(--s-6);
+  }
+
+  .hero__statement {
+    max-width: 21em;
+    font-size: var(--text-xl);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
 
   .hero__actions {
@@ -211,238 +321,338 @@ const contactLinks = [...links.contact, ...links.social];
     margin-block-start: var(--s-4);
   }
 
-  /* Credential chips: plain statements of what I work on, no numbers. */
-
-  .hero__chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-1);
-    max-width: 26rem;
-    margin-block-start: var(--s-3);
+  .hero__facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-3);
+    padding-block-start: var(--s-3);
+    border-block-start: var(--hairline) solid var(--border);
   }
 
-  .chip {
-    display: inline-flex;
+  .hero__facts dd {
+    margin-block-start: 0.25rem;
+    font-size: var(--text-md);
+    line-height: 1.4;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__word {
+      animation: hero-rise 1000ms var(--ease-out) both;
+    }
+
+    .hero__line + .hero__line .hero__word {
+      animation-delay: 110ms;
+    }
+
+    .hero__roles,
+    .hero__foot {
+      animation: hero-fade 800ms var(--ease-out) 350ms both;
+    }
+
+    .hero__cursor {
+      animation: hero-blink 1.2s steps(1, end) 1.4s infinite;
+    }
+  }
+
+  @keyframes hero-rise {
+    from {
+      transform: translateY(105%);
+    }
+  }
+
+  @keyframes hero-fade {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  @keyframes hero-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (min-width: 40rem) {
+    .hero__roles {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0 0.75em;
+    }
+
+    .hero__sep {
+      display: inline;
+      color: var(--accent);
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .hero {
+      min-height: min(calc(100svh - var(--header-h)), 56rem);
+      padding-block: var(--s-10) var(--s-6);
+    }
+
+    .hero__name {
+      margin-block-start: var(--s-4);
+    }
+
+    .hero__foot {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: end;
+      gap: var(--s-8);
+      margin-block-start: var(--s-8);
+    }
+
+    .hero__statement {
+      font-size: clamp(1.5rem, 1rem + 1.1vw, 1.875rem);
+    }
+  }
+
+  /* Ticker ----------------------------------------------------------------- */
+
+  .ticker {
+    display: flex;
+    gap: var(--s-6);
+    padding-block: var(--s-3);
+    border-block: var(--hairline) solid var(--border);
+    overflow: hidden;
+    user-select: none;
+  }
+
+  .ticker__track {
+    flex: none;
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
-    min-height: 2rem;
-    padding-inline: 0.625rem 0.75rem;
-    border: var(--hairline) solid var(--border);
-    border-radius: var(--radius);
-    background: color-mix(in srgb, var(--surface) 70%, transparent);
-    color: var(--text);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    line-height: 1;
+    gap: var(--s-6);
+    min-width: 100%;
+    justify-content: space-around;
+    color: var(--muted);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    letter-spacing: -0.025em;
     white-space: nowrap;
   }
 
-  .chip :global(.icon) {
-    color: var(--muted);
+  .ticker__track li {
+    display: flex;
+    align-items: center;
+    gap: var(--s-6);
   }
 
-  /* The terminal sits on a soft accent glow. The glow is a plain gradient,
-     not a blur filter, and does not move. */
-  .hero__terminal {
-    position: relative;
-    min-width: 0;
+  .ticker__track li::after {
+    content: '/';
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.75em;
+    font-weight: 500;
   }
 
-  .hero__terminal::before {
-    content: '';
-    position: absolute;
-    inset: -45% -40%;
-    z-index: -1;
-    background: radial-gradient(
-      closest-side,
-      var(--glow),
-      color-mix(in srgb, var(--glow) 45%, transparent) 55%,
-      transparent
-    );
-    pointer-events: none;
-  }
-
-  @media (min-width: 30rem) {
-    .hero__id {
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: var(--s-1) var(--s-2);
+  @media (prefers-reduced-motion: no-preference) {
+    .ticker__track {
+      animation: ticker 48s linear infinite;
     }
 
-    .hero__id .label {
-      padding-inline-start: var(--s-2);
-      border-inline-start: var(--hairline) solid var(--border-strong);
+    .ticker:hover .ticker__track {
+      animation-play-state: paused;
+    }
+  }
+
+  /* Without motion the strip is a plain wrapped list. */
+  @media (prefers-reduced-motion: reduce) {
+    .ticker {
+      padding-inline: var(--gutter);
+    }
+
+    .ticker__track {
+      flex: 1;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      gap: var(--s-1) var(--s-3);
+      min-width: 0;
+      white-space: normal;
+    }
+
+    .ticker__track li {
+      gap: var(--s-3);
+    }
+
+    .ticker__track[aria-hidden] {
+      display: none;
+    }
+  }
+
+  @keyframes ticker {
+    to {
+      transform: translateX(calc(-100% - var(--s-6)));
     }
   }
 
   @media (min-width: 48rem) {
-    .hero {
-      padding-block: var(--s-6) var(--s-10);
+    .ticker {
+      padding-block: var(--s-4);
     }
 
-    .hero h1 {
-      max-width: 20ch;
-    }
-
-    .hero__actions {
-      margin-block-start: var(--s-5);
+    .ticker__track {
+      font-size: var(--text-2xl);
     }
   }
 
-  /* Two columns: copy about 55%, terminal about 45%, centred on each other
-     and sized so the whole hero fits one screen under the navigation. */
-  @media (min-width: 64rem) {
-    .hero {
-      --hero-pad: var(--s-6);
-      grid-template-columns: minmax(0, 55fr) minmax(0, 45fr);
-      align-items: center;
-      gap: var(--s-6);
-      min-height: min(calc(100svh - var(--header-h) - 1px), 46rem);
-      padding-block: var(--hero-pad);
-    }
-
-    .hero h1 {
-      max-width: none;
-      font-size: clamp(2.625rem, 1rem + 2.6vw, 3.25rem);
-    }
-
-    .hero .lead {
-      max-width: 30em;
-    }
-
-    .hero__actions {
-      margin-block-start: var(--s-4);
-    }
-
-    /* The window runs a little past the right edge of the content column. */
-    .hero__terminal {
-      margin-inline-end: calc(var(--s-2) * -1);
-      --term-pad: 1.25rem;
-      --term-size: 0.8125rem;
-      --term-screen-max: none;
-      --term-height: clamp(
-        20rem,
-        calc(100svh - var(--header-h) - 1px - var(--hero-pad) * 2),
-        33rem
-      );
-    }
-  }
-
-  @media (min-width: 80rem) {
-    .hero__terminal {
-      margin-inline-end: calc(var(--s-4) * -1);
-    }
-  }
-
-  /* Bands: each section runs the full width, with a hairline on its top edge
-     and every other one a shade off the page background, so the sections
-     read as separate without relying on whitespace alone. */
+  /* Sections --------------------------------------------------------------- */
 
   .band {
-    padding-block: var(--band-pad);
-    border-block-start: var(--hairline) solid var(--border);
+    padding-block-start: var(--band-pad);
   }
 
-  .band--alt {
-    background: var(--bg-alt);
+  /* About: facts in a narrow column, the text beside them. */
+
+  .about {
+    display: grid;
+    gap: var(--s-6);
   }
 
-  /* The last band runs straight into the footer. */
-  :global(body.home .site-footer) {
-    margin-block-start: 0;
+  .about__facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-3);
+    align-content: start;
   }
 
-  /* Featured work */
+  .about__facts dd {
+    margin-block-start: 0.25rem;
+    font-size: var(--text-md);
+    line-height: 1.4;
+  }
 
-  .work__note {
+  .about__text {
+    display: grid;
+    gap: var(--s-3);
     max-width: var(--measure);
-    margin-block: calc(var(--s-3) * -1) var(--s-5);
+    font-size: var(--text-lg);
+    line-height: 1.55;
     color: var(--muted);
   }
 
-  .work__writeups {
-    margin-block-end: var(--s-6);
+  .about__text p:first-child {
+    color: var(--text);
   }
 
-  .work__subhead {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--s-2);
-    margin-block-end: var(--s-2);
-  }
+  /* Focus: a numbered list with large numerals. */
 
-  .work__builds {
-    margin-block-end: var(--s-2);
-  }
-
-  /* Focus areas and contact share a two-column layout on wide screens. */
-
-  .focus,
-  .contact {
+  .focus li {
     display: grid;
-    gap: var(--s-5);
-  }
-
-  .focus__head p,
-  .contact__head p {
-    max-width: 26em;
-    margin-block-start: var(--s-2);
-    color: var(--muted);
-  }
-
-  .contact__head p + p {
-    margin-block-start: var(--s-1);
-  }
-
-  .focus__list li {
-    display: grid;
-    grid-template-columns: 2.5rem minmax(0, 1fr);
-    gap: var(--s-2);
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    gap: var(--s-1) var(--s-2);
     padding-block: var(--s-4);
   }
 
-  .focus__list .label {
-    line-height: 1.625rem;
+  .focus__num {
+    grid-row: span 2;
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--muted);
+    transition: color 200ms var(--ease);
   }
 
-  .focus__list p {
+  .focus li:hover .focus__num {
+    color: var(--accent);
+  }
+
+  .focus h3 {
+    font-size: var(--text-xl);
+    letter-spacing: -0.025em;
+  }
+
+  .focus p {
     max-width: var(--measure);
-    margin-block-start: var(--s-1);
     color: var(--muted);
   }
 
-  .contact__list a {
+  /* Contact: whole rows are links and change colour together. */
+
+  .contact a {
     display: grid;
-    grid-template-columns: 6.5rem minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: baseline;
-    gap: var(--s-2);
-    padding-block: 1.125rem;
+    gap: 0.25rem var(--s-2);
+    padding-block: var(--s-3);
     color: var(--text);
     text-decoration: none;
+    transition: color 200ms var(--ease);
+  }
+
+  .contact .label {
+    grid-column: 1 / -1;
+    transition: color 200ms var(--ease);
   }
 
   .contact__value {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
     overflow-wrap: anywhere;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.2em;
-    text-decoration-color: var(--border-strong);
-    transition: text-decoration-color 120ms var(--ease);
   }
 
-  .contact__list a:hover .contact__value {
+  .contact__arrow {
+    font-family: var(--font-mono);
+    font-size: var(--text-md);
+    color: var(--muted);
+    transition:
+      color 200ms var(--ease),
+      transform 200ms var(--ease);
+  }
+
+  .contact a:hover,
+  .contact a:hover .label,
+  .contact a:hover .contact__arrow {
     color: var(--accent);
-    text-decoration-color: currentColor;
+  }
+
+  .contact a:hover .contact__arrow {
+    transform: translate(2px, -2px);
+  }
+
+  .contact li:has(a:hover) {
+    border-block-end-color: var(--accent);
   }
 
   @media (min-width: 60rem) {
-    .focus,
-    .contact {
+    .about {
       grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
       gap: var(--s-8);
-      align-items: start;
+    }
+
+    .about__facts {
+      grid-template-columns: 1fr;
+      gap: var(--s-3);
+    }
+
+    .focus li {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 4fr) minmax(0, 6fr);
+      align-items: baseline;
+      gap: var(--s-4);
+      padding-block: var(--s-5);
+    }
+
+    .focus__num {
+      grid-row: auto;
+      font-size: var(--text-3xl);
+    }
+
+    .contact a {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 10fr) auto;
+      gap: var(--s-4);
+      padding-block: var(--s-4);
+    }
+
+    .contact .label {
+      grid-column: auto;
+    }
+
+    .contact__value {
+      font-size: var(--text-2xl);
     }
   }
 </style>

@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import ProjectRows from '../components/ProjectRows.astro';
+import SectionHead from '../components/SectionHead.astro';
 import { getProjects } from '../lib/content';
 
 const projects = await getProjects();
@@ -16,43 +17,51 @@ const earlier = projects.filter((p) => p.data.kind === 'development' && !p.data.
 >
   <div class="container">
     <header class="page-head">
+      <p class="label">Projects / {projects.length}</p>
       <h1>Projects</h1>
       <p class="lead">
         Things I've built. The security work is recent. The development work is from my time as a
         full-stack developer.
       </p>
       <ul class="jump" aria-label="On this page">
-        <li><a href="#security">Security</a></li>
-        <li><a href="#development">Development</a></li>
-        <li><a href="#earlier">Earlier builds</a></li>
+        <li><a class="label arrow-link" href="#security">Security</a></li>
+        <li><a class="label arrow-link" href="#development">Development</a></li>
+        <li><a class="label arrow-link" href="#earlier">Earlier builds</a></li>
       </ul>
     </header>
 
     <section id="security" class="section" aria-labelledby="security-title">
-      <div class="section-head">
-        <h2 id="security-title">Security</h2>
-        <p>Tooling and hardening work.</p>
-      </div>
+      <SectionHead id="security-title" number={1} label="Security" title="Tooling and hardening work." sub />
       <div class="project-grid">
-        {security.map((project, i) => <ProjectCard project={project} priority={i === 0} />)}
+        {
+          security.map((project, i) => (
+            <ProjectCard project={project} number={i + 1} priority={i === 0} />
+          ))
+        }
       </div>
     </section>
 
     <section id="development" class="section" aria-labelledby="development-title" data-reveal>
-      <div class="section-head">
-        <h2 id="development-title">Development</h2>
-        <p>Web apps I built or helped build as a developer.</p>
-      </div>
+      <SectionHead
+        id="development-title"
+        number={2}
+        label="Development"
+        title="Web apps I built or helped build as a developer."
+        sub
+      />
       <div class="project-grid">
-        {development.map((project) => <ProjectCard project={project} />)}
+        {development.map((project, i) => <ProjectCard project={project} number={i + 1} />)}
       </div>
     </section>
 
     <section id="earlier" class="section" aria-labelledby="earlier-title" data-reveal>
-      <div class="section-head">
-        <h2 id="earlier-title">Earlier builds</h2>
-        <p>Older front-end and mobile projects.</p>
-      </div>
+      <SectionHead
+        id="earlier-title"
+        number={3}
+        label="Earlier builds"
+        title="Older front-end and mobile projects."
+        sub
+      />
       <ProjectRows projects={earlier} />
     </section>
   </div>
@@ -62,9 +71,21 @@ const earlier = projects.filter((p) => p.data.kind === 'development' && !p.data.
   .jump {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--s-1) var(--s-3);
-    margin-block-start: var(--s-4);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
+    gap: var(--s-1) var(--s-4);
+    margin-block-start: var(--s-5);
+  }
+
+  .jump a {
+    min-height: 2.75rem;
+    align-items: center;
+  }
+
+  /* On this page the arrows point down the page. */
+  .jump a::after {
+    content: '\2193'; /* down arrow */
+  }
+
+  .jump a:hover::after {
+    transform: translateY(3px);
   }
 </style>

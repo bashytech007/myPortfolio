@@ -1,4 +1,5 @@
 ---
+/** Projects without a screenshot, as a numbered index. */
 import type { Project } from '../lib/content';
 
 interface Props {
@@ -8,29 +9,31 @@ interface Props {
 const { projects } = Astro.props;
 ---
 
-<ul class="rows">
+<ol class="rows index">
   {
-    projects.map(({ data }) => (
+    projects.map(({ data }, i) => (
       <li class="build">
+        <span class="label build__num" aria-hidden="true">
+          {String(i + 1).padStart(2, '0')}
+        </span>
         <div class="build__main">
           <h3 class="build__title">{data.title}</h3>
           <p class="build__summary">{data.summary}</p>
         </div>
         <ul class="tags" aria-label="Tags">
-          <li class="tag">{data.kind}</li>
           {data.tags.map((tag) => (
             <li class="tag">{tag}</li>
           ))}
         </ul>
         <p class="build__links">
           {data.live && (
-            <a class="text-link" href={data.live} rel="noopener noreferrer">
+            <a class="arrow-link" href={data.live} data-external rel="noopener noreferrer">
               Live
               <span class="visually-hidden">: {data.title}</span>
             </a>
           )}
           {data.source && (
-            <a class="text-link" href={data.source} rel="noopener noreferrer">
+            <a class="arrow-link" href={data.source} data-external rel="noopener noreferrer">
               Source
               <span class="visually-hidden">: {data.title}</span>
             </a>
@@ -39,18 +42,32 @@ const { projects } = Astro.props;
       </li>
     ))
   }
-</ul>
+</ol>
 
 <style>
   .build {
     display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
     gap: var(--s-2);
     padding-block: var(--s-3);
   }
 
+  .build > :not(.build__num) {
+    grid-column: 2;
+  }
+
+  .build__num {
+    line-height: 1.75rem;
+    transition: color 200ms var(--ease);
+  }
+
+  .build:hover .build__num {
+    color: var(--accent);
+  }
+
   .build__title {
-    font-size: var(--text-body);
-    letter-spacing: -0.01em;
+    font-size: var(--text-lg);
+    letter-spacing: -0.02em;
   }
 
   .build__summary {
@@ -68,9 +85,14 @@ const { projects } = Astro.props;
 
   @media (min-width: 60rem) {
     .build {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 18rem) 7.5rem;
+      grid-template-columns: 3.5rem minmax(0, 1fr) minmax(0, 16rem) 8.5rem;
       gap: var(--s-4);
       align-items: start;
+      padding-block: var(--s-4);
+    }
+
+    .build > :not(.build__num) {
+      grid-column: auto;
     }
 
     .build__links {

@@ -7,5 +7,6 @@ image: ./images/this-site.png
 imageAlt: "Home page of this site, with the headline above a terminal window."
 live: "/security"
 liveLabel: "How it is hardened"
+featured: true
 order: 0
 ---
