@@ -30,6 +30,7 @@
 
 /* ==========================================================================
    Tokens
+   The reasoning behind these is in docs/design-notes.md.
    ========================================================================== */
 
 :root {
@@ -45,60 +46,61 @@
   --s-4: 2rem; /* 32 */
   --s-5: 2.5rem; /* 40 */
   --s-6: 3rem; /* 48 */
+  --s-7: 3.5rem; /* 56 */
   --s-8: 4rem; /* 64 */
   --s-10: 5rem; /* 80 */
   --s-12: 6rem; /* 96 */
   --s-14: 7rem; /* 112 */
 
-  --section-gap: var(--s-8);
-  --band-pad: var(--s-6);
-  /* Height of the part of the header that stays on screen while scrolling. */
-  --header-h: 2.75rem;
+  --section-gap: var(--s-10);
+  /* Space above and below each numbered section. */
+  --band-pad: var(--s-10);
+  /* Height of the sticky header. */
+  --header-h: 3.5rem;
   --gutter: 1.25rem;
-  --content: 68.75rem; /* 1100px */
+  --content: 69rem; /* 1104px */
   --measure: 36em; /* about 70 characters of body text */
 
-  --radius: 10px;
+  --radius: 12px; /* screenshots and panels */
+  --radius-sm: 6px; /* tags and small controls */
+  --radius-pill: 999px;
   --hairline: 1px;
 
-  /* Type scale */
+  /* Type scale. It jumps on purpose: labels, body, titles, statements. */
+  --text-label: 0.6875rem; /* 11 */
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-md: 1rem;
   --text-body: 1.0625rem;
   --text-lg: 1.25rem;
   --text-xl: 1.5rem;
-  --text-2xl: clamp(1.75rem, 1.45rem + 1.4vw, 2.5rem);
-  --text-3xl: clamp(2.25rem, 1.35rem + 4.2vw, 3.75rem);
+  --text-2xl: clamp(1.625rem, 1.3rem + 1.5vw, 2.25rem);
+  --text-3xl: clamp(2.125rem, 1.35rem + 3.6vw, 3.5rem);
+  /* The name in the hero: sized to the viewport, capped on wide screens. */
+  --text-display: clamp(4.25rem, 21vw, 13rem);
+
+  --track-label: 0.16em;
+  --track-tight: -0.03em;
 
   --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Dark theme (default) */
   color-scheme: dark;
-  --bg: #0e1013;
-  --bg-alt: #121519;
-  --surface: #14171b;
-  --surface-2: #1a1e23;
-  --border: #262b32;
-  --border-strong: #3a414b;
-  --text: #e9e7e2;
-  --muted: #b1b8c2;
+  --bg: #0b0c0e;
+  --bg-alt: #0f1113;
+  --surface: #121417;
+  --surface-2: #181b1f;
+  --border: #23272c;
+  --border-strong: #3a4049;
+  --text: #ecebe6;
+  --muted: #a9afb8;
   --accent: #f0935c;
   --accent-hover: #f6a877;
   --on-accent: #17100a;
   --accent-wash: rgb(240 147 92 / 0.1);
-  --shadow: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 28px 56px -32px rgb(0 0 0 / 0.75);
-  --shadow-window:
-    0 2px 6px rgb(0 0 0 / 0.35), 0 18px 36px -14px rgb(0 0 0 / 0.6),
-    0 56px 96px -36px rgb(0 0 0 / 0.9);
-  --shadow-lift: 0 12px 22px -14px rgb(0 0 0 / 0.85);
-  --btn-highlight: rgb(255 255 255 / 0.38);
-  --bar-highlight: rgb(255 255 255 / 0.05);
-  --grid-line: rgb(233 231 226 / 0.05);
-  --glow: rgb(240 147 92 / 0.16);
-  --dot-close: #a8645c;
-  --dot-min: #a58a58;
-  --dot-max: #62876a;
+  --grid-line: rgb(236 235 230 / 0.045);
+  --glow: rgb(240 147 92 / 0.13);
 }
 
 :root[data-theme='light'] {
@@ -115,31 +117,16 @@
   --accent-hover: #8c3511;
   --on-accent: #ffffff;
   --accent-wash: rgb(171 67 24 / 0.08);
-  --shadow: 0 28px 56px -36px rgb(23 25 28 / 0.35);
-  --shadow-window:
-    0 2px 6px rgb(23 25 28 / 0.06), 0 18px 36px -14px rgb(23 25 28 / 0.16),
-    0 56px 96px -36px rgb(23 25 28 / 0.34);
-  --shadow-lift: 0 12px 22px -14px rgb(23 25 28 / 0.45);
-  --btn-highlight: rgb(255 255 255 / 0.24);
-  --bar-highlight: rgb(255 255 255 / 0.6);
   --grid-line: rgb(23 25 28 / 0.055);
-  --glow: rgb(171 67 24 / 0.1);
-  --dot-close: #d2928a;
-  --dot-min: #d3bb88;
-  --dot-max: #98bd9f;
-}
-
-@media (min-width: 40rem) {
-  :root {
-    --header-h: 4rem;
-  }
+  --glow: rgb(171 67 24 / 0.08);
 }
 
 @media (min-width: 48rem) {
   :root {
+    --header-h: 4rem;
     --section-gap: var(--s-12);
-    --band-pad: 4.5rem;
-    --gutter: 2rem;
+    --band-pad: var(--s-14);
+    --gutter: 2.5rem;
     --text-body: 1.125rem;
   }
 }
@@ -147,7 +134,7 @@
 @media (min-width: 75rem) {
   :root {
     --section-gap: var(--s-14);
-    --band-pad: 5.5rem;
+    --band-pad: 9rem;
   }
 }
 
@@ -164,7 +151,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  scroll-padding-top: calc(var(--header-h) + var(--s-3));
+  scroll-padding-top: calc(var(--header-h) + var(--s-2));
   background: var(--bg);
 }
 
@@ -227,13 +214,14 @@ h4 {
 
 h1 {
   font-size: var(--text-3xl);
-  line-height: 1.06;
-  letter-spacing: -0.02em;
+  line-height: 1.04;
+  letter-spacing: var(--track-tight);
 }
 
 h2 {
   font-size: var(--text-2xl);
-  letter-spacing: -0.028em;
+  line-height: 1.1;
+  letter-spacing: var(--track-tight);
 }
 
 h3 {
@@ -263,8 +251,8 @@ a {
   text-underline-offset: 0.2em;
   text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
   transition:
-    color 120ms var(--ease),
-    text-decoration-color 120ms var(--ease);
+    color 160ms var(--ease),
+    text-decoration-color 160ms var(--ease);
 }
 
 a:hover {
@@ -322,18 +310,50 @@ samp {
   padding-block-start: var(--section-gap);
 }
 
+/* Every section opens the same way: a rule, a small numbered label, then a
+   large statement. The markup comes from components/SectionHead.astro. */
 .section-head {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: var(--s-1) var(--s-3);
-  margin-block-end: var(--s-5);
+  margin-block-end: var(--s-6);
+  padding-block-start: var(--s-3);
+  border-block-start: var(--hairline) solid var(--border);
 }
 
-.section-head p {
-  grid-column: 1 / -1;
+.section-head__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-2);
+}
+
+.section-head__title {
+  max-width: 20em;
+  margin-block-start: var(--s-4);
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  line-height: 1.06;
+}
+
+.section-head__intro {
   max-width: var(--measure);
+  margin-block-start: var(--s-3);
   color: var(--muted);
+}
+
+/* Groups inside a page (for example on /projects) use a smaller title. */
+.section-head--sub .section-head__title {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+}
+
+@media (min-width: 48rem) {
+  .section-head {
+    margin-block-end: var(--s-10);
+    padding-block-start: var(--s-5);
+  }
+
+  .section-head--sub {
+    margin-block-end: var(--s-7);
+  }
 }
 
 .page-head {
@@ -341,16 +361,23 @@ samp {
 }
 
 .page-head h1 {
-  font-size: clamp(2.25rem, 1.6rem + 3vw, 3.5rem);
+  max-width: 16em;
+  font-size: clamp(2.5rem, 1.5rem + 4.4vw, 4.5rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.page-head .label + h1 {
+  margin-block-start: var(--s-3);
 }
 
 .page-head .lead {
-  margin-block-start: var(--s-3);
+  margin-block-start: var(--s-4);
 }
 
 @media (min-width: 48rem) {
   .page-head {
-    padding-block-start: var(--s-12);
+    padding-block-start: var(--s-14);
   }
 }
 
@@ -361,12 +388,13 @@ samp {
   color: var(--muted);
 }
 
+/* Small uppercase monospace label: section numbers, categories, metadata. */
 .label {
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  font-size: var(--text-label);
   font-weight: 500;
-  line-height: 1.4;
-  letter-spacing: 0.08em;
+  line-height: 1.5;
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -394,7 +422,7 @@ samp {
   inset-inline-start: var(--s-1);
   z-index: 30;
   padding: var(--s-1) var(--s-2);
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
   background: var(--accent);
   color: var(--on-accent);
   font-size: var(--text-sm);
@@ -417,42 +445,36 @@ samp {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.625rem;
   min-height: 3rem;
   padding: 0 var(--s-3);
   border: var(--hairline) solid var(--border-strong);
-  border-radius: var(--radius);
+  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--text);
-  font-size: var(--text-md);
+  font-size: 0.9375rem;
   font-weight: 550;
   line-height: 1;
   letter-spacing: -0.005em;
   text-decoration: none;
   white-space: nowrap;
   transition:
-    background-color 120ms var(--ease),
-    border-color 120ms var(--ease),
-    color 120ms var(--ease),
-    box-shadow 160ms var(--ease),
-    transform 160ms var(--ease);
+    background-color 160ms var(--ease),
+    border-color 160ms var(--ease),
+    color 160ms var(--ease),
+    transform 200ms var(--ease);
 }
 
 .btn:hover {
   border-color: var(--text);
-  background: var(--surface-2);
   color: var(--text);
-  box-shadow: var(--shadow-lift);
-}
-
-.btn:active {
-  box-shadow: none;
 }
 
 /* Focus ring: the accent outline plus a soft halo. */
 .btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: var(--radius);
+  border-radius: var(--radius-pill);
   box-shadow: 0 0 0 7px var(--accent-wash);
 }
 
@@ -466,31 +488,25 @@ samp {
   }
 }
 
+/* The one solid shape on a page: a pill in the text colour. */
 .btn--primary {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--on-accent);
-  /* A thin highlight along the top edge. */
-  box-shadow: 0 1px 0 var(--btn-highlight) inset;
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--bg);
 }
 
 .btn--primary:hover {
-  border-color: var(--accent-hover);
-  background: var(--accent-hover);
+  border-color: var(--accent);
+  background: var(--accent);
   color: var(--on-accent);
-  box-shadow:
-    0 1px 0 var(--btn-highlight) inset,
-    var(--shadow-lift);
 }
 
-.btn--primary:active {
-  box-shadow: 0 1px 0 var(--btn-highlight) inset;
-}
-
-.btn--primary:focus-visible {
-  box-shadow:
-    0 1px 0 var(--btn-highlight) inset,
-    0 0 0 7px var(--accent-wash);
+/* The ">_" in front of a link to the terminal. */
+.btn__glyph {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--accent);
 }
 
 .tags {
@@ -502,13 +518,14 @@ samp {
 .tag {
   display: inline-flex;
   align-items: center;
-  min-height: 1.625rem;
-  padding: 0 0.625rem;
+  min-height: 1.5rem;
+  padding: 0 0.5rem;
   border: var(--hairline) solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  font-size: var(--text-label);
   line-height: 1;
+  letter-spacing: 0.04em;
   color: var(--muted);
   white-space: nowrap;
 }
@@ -516,7 +533,7 @@ samp {
 .tag--draft {
   border-color: var(--accent);
   color: var(--accent);
-  letter-spacing: 0.08em;
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
 }
 
@@ -525,20 +542,77 @@ samp {
   font-weight: 500;
 }
 
+/* A link with an arrow that nudges on hover: "all projects", project links. */
+.arrow-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.375em;
+  font-size: var(--text-md);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.arrow-link::after {
+  content: '\2192'; /* right arrow */
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  transition: transform 200ms var(--ease);
+}
+
+.arrow-link[data-external]::after {
+  content: '\2197'; /* up-right arrow */
+}
+
+.arrow-link:hover::after {
+  transform: translateX(3px);
+}
+
+.arrow-link[data-external]:hover::after {
+  transform: translate(2px, -2px);
+}
+
+.label.arrow-link {
+  font-size: var(--text-label);
+  color: var(--muted);
+}
+
+.label.arrow-link:hover {
+  color: var(--text);
+}
+
 .card {
   border: var(--hairline) solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
 }
 
+/* Project grid: one column on a phone, two from 52rem. In the staggered
+   variant the second column starts lower, so the grid reads as a sequence
+   and not as a table. */
 .project-grid {
   display: grid;
-  gap: var(--s-3);
+  gap: var(--s-8) var(--s-7);
 }
 
-@media (min-width: 60rem) {
+@media (min-width: 52rem) {
   .project-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: var(--s-10);
+  }
+
+  .project-grid--stagger {
+    padding-block-end: var(--s-12);
+  }
+
+  .project-grid--stagger > :nth-child(even) {
+    position: relative;
+    inset-block-start: var(--s-12);
+  }
+}
+
+@media (min-width: 75rem) {
+  .project-grid {
+    column-gap: var(--s-10);
   }
 }
 
@@ -606,7 +680,7 @@ samp {
 .prose :not(pre) > code {
   padding: 0.15em 0.4em;
   border: var(--hairline) solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
   overflow-wrap: anywhere;
 }
@@ -656,18 +730,18 @@ samp {
    Motion
    ========================================================================== */
 
-/* Sections below the fold fade in once as they enter. The class is only added
+/* Sections below the fold fade up once as they enter. The class is only added
    by script, so content is never hidden when JavaScript does not run. */
 @media (prefers-reduced-motion: no-preference) {
   .reveal-pending {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(16px);
   }
 
   .reveal-in {
     transition:
-      opacity 420ms var(--ease),
-      transform 420ms var(--ease);
+      opacity 700ms var(--ease-out),
+      transform 700ms var(--ease-out);
   }
 }
 
