@@ -432,28 +432,65 @@ samp {
   transition:
     background-color 120ms var(--ease),
     border-color 120ms var(--ease),
-    color 120ms var(--ease);
+    color 120ms var(--ease),
+    box-shadow 160ms var(--ease),
+    transform 160ms var(--ease);
 }
 
 .btn:hover {
   border-color: var(--text);
+  background: var(--surface-2);
   color: var(--text);
+  box-shadow: var(--shadow-lift);
 }
 
+.btn:active {
+  box-shadow: none;
+}
+
+/* Focus ring: the accent outline plus a soft halo. */
 .btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
   border-radius: var(--radius);
+  box-shadow: 0 0 0 7px var(--accent-wash);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn:active {
+    transform: none;
+  }
 }
 
 .btn--primary {
   border-color: var(--accent);
   background: var(--accent);
   color: var(--on-accent);
+  /* A thin highlight along the top edge. */
+  box-shadow: 0 1px 0 var(--btn-highlight) inset;
 }
 
 .btn--primary:hover {
   border-color: var(--accent-hover);
   background: var(--accent-hover);
   color: var(--on-accent);
+  box-shadow:
+    0 1px 0 var(--btn-highlight) inset,
+    var(--shadow-lift);
+}
+
+.btn--primary:active {
+  box-shadow: 0 1px 0 var(--btn-highlight) inset;
+}
+
+.btn--primary:focus-visible {
+  box-shadow:
+    0 1px 0 var(--btn-highlight) inset,
+    0 0 0 7px var(--accent-wash);
 }
 
 .tags {
