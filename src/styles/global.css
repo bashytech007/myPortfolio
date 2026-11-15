@@ -51,6 +51,9 @@
   --s-14: 7rem; /* 112 */
 
   --section-gap: var(--s-8);
+  --band-pad: var(--s-6);
+  /* Height of the part of the header that stays on screen while scrolling. */
+  --header-h: 2.75rem;
   --gutter: 1.25rem;
   --content: 68.75rem; /* 1100px */
   --measure: 36em; /* about 70 characters of body text */
@@ -144,6 +147,7 @@
 @media (min-width: 75rem) {
   :root {
     --section-gap: var(--s-14);
+    --band-pad: 5.5rem;
   }
 }
 
