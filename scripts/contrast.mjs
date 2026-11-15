@@ -27,7 +27,10 @@ const ratio = (a, b) => {
 // [foreground, background, minimum ratio]
 const pairs = [
   ['text', 'bg', 4.5], ['text', 'surface', 4.5], ['text', 'surface-2', 4.5],
-  ['muted', 'bg', 4.5], ['muted', 'surface', 4.5], ['muted', 'surface-2', 4.5],
+  ['text', 'bg-alt', 4.5],
+  // Secondary text is held well above the 4.5 minimum.
+  ['muted', 'bg', 7], ['muted', 'bg-alt', 7], ['muted', 'surface', 7], ['muted', 'surface-2', 7],
+  ['accent', 'bg-alt', 4.5],
   ['accent', 'bg', 4.5], ['accent', 'surface', 4.5], ['accent', 'surface-2', 4.5],
   ['accent-hover', 'bg', 4.5], ['accent-hover', 'surface', 4.5],
   ['on-accent', 'accent', 4.5], ['on-accent', 'accent-hover', 4.5],

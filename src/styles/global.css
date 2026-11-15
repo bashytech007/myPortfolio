@@ -73,12 +73,13 @@
   /* Dark theme (default) */
   color-scheme: dark;
   --bg: #0e1013;
+  --bg-alt: #121519;
   --surface: #14171b;
   --surface-2: #1a1e23;
   --border: #262b32;
   --border-strong: #3a414b;
   --text: #e9e7e2;
-  --muted: #9ba3ae;
+  --muted: #b1b8c2;
   --accent: #f0935c;
   --accent-hover: #f6a877;
   --on-accent: #17100a;
@@ -89,12 +90,13 @@
 :root[data-theme='light'] {
   color-scheme: light;
   --bg: #f6f5f1;
+  --bg-alt: #f0eee9;
   --surface: #ffffff;
   --surface-2: #efede8;
   --border: #dedbd3;
   --border-strong: #c2beb4;
   --text: #17191c;
-  --muted: #575e69;
+  --muted: #474e58;
   --accent: #ab4318;
   --accent-hover: #8c3511;
   --on-accent: #ffffff;
@@ -192,8 +194,8 @@ h4 {
 
 h1 {
   font-size: var(--text-3xl);
-  line-height: 1.04;
-  letter-spacing: -0.035em;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
 }
 
 h2 {
