@@ -38,6 +38,7 @@ Nothing below needs a component change.
 | What                       | Where                                   |
 | -------------------------- | --------------------------------------- |
 | Name, headline, about text | `src/content/site.json`                 |
+| Hero label and chips       | `src/content/site.json` (`disciplines`, `credentials`) |
 | Focus areas                | `src/content/site.json` (`focus`)       |
 | Email and profile links    | `src/content/links.json`                |
 | Projects                   | `src/content/projects/*.md`             |
@@ -74,7 +75,7 @@ src/
   layouts/Base.astro  <head>, navigation, footer
   components/       Header, Footer, Terminal, cards and lists
   pages/            /, /writeups, /projects, /security, 404, robots.txt, sitemap.xml
-  scripts/          theme, scroll reveal, terminal (TypeScript, no framework)
+  scripts/          theme, navigation, scroll reveal, terminal (TypeScript, no framework)
   styles/           global.css (tokens, type, layout), terminal.css
 public/             theme-init.js, favicon, og.png
 scripts/            preview server, build verification, contrast check
