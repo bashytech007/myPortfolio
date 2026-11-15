@@ -118,7 +118,9 @@ html:has(.term-page) {
   color: var(--ph-bright);
 }
 
+/* The window title only shows where there is room beside the back link. */
 .tty__title {
+  display: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -514,15 +516,13 @@ html:not(.js) .tty__prompt {
 
 .tty__chips {
   flex: none;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.5rem;
   padding-block-end: env(safe-area-inset-bottom);
-  overflow-x: auto;
-  scrollbar-width: none;
 }
 
 .term-chip {
-  flex: 1 0 auto;
   min-height: 2.5rem;
   padding: 0 0.875rem;
   border: var(--hairline) solid var(--ph-edge);
@@ -560,6 +560,10 @@ html:not(.js) .tty__prompt {
 @media (min-width: 30rem) {
   .term-ps1__host {
     display: inline;
+  }
+
+  .tty__title {
+    display: block;
   }
 }
 
@@ -606,11 +610,10 @@ html:not(.js) .tty__prompt {
   }
 
   .tty__chips {
-    gap: 0.5rem;
+    display: flex;
   }
 
   .term-chip {
-    flex: none;
     min-height: 1.875rem;
   }
 }
