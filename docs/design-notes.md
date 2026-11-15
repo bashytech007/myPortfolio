@@ -35,15 +35,17 @@ pill button in the text colour.
 
 **Hover.** Small and consistent. Navigation links grow an underline from one
 side. Text links are already in the accent. Rows in the link list change colour
-as a whole. Screenshots scale up 2% inside their frame. Hover effects only
-exist for a mouse; a tap gets a press state instead.
+as a whole. Screenshots scale up 2% inside their frame. Buttons lift 2px.
+Hover effects only exist for a mouse; on a touch screen a button gets a press
+state instead.
 
-**Motion.** Short and composited. The wordmark and buttons arrive in one
-entrance of about 620ms, sections fade in once over 240ms with a rise of 8px
-at most, buttons dip slightly when pressed, and a slow strip of words drifts
-sideways (pausable). The only other loops are the two block cursors. Everything
-is removed or reduced to a simple fade under reduced motion. The rules are in
-`DESIGN.md`.
+**Motion.** Short and composited. On load the name rises into place and the
+roles, statement, buttons and facts follow in one entrance that is over in
+620ms. Sections fade in once over 240ms with a rise of 8px, buttons dip
+slightly when pressed, and a slow strip of words drifts sideways and pauses
+under a mouse pointer. The only other loops are the two block cursors. Under
+reduced motion nothing moves or loops: the hero text fades in and everything
+else is simply there. The rules and the exact values are in `DESIGN.md`.
 
 **Rhythm.** Every section starts the same way: rule, small numbered label
 ("01 / ..."), then a large statement. Projects repeat one unit: big numeral,
@@ -81,6 +83,6 @@ buttons become the main way in.
 | Hairlines, not boxes | `.section-head` rule and label, `.rows` lists, 12px radius on screenshots only. |
 | Numbered sections | `SectionHead.astro` numbers each home section in order. |
 | One repeated project unit | `ProjectCard.astro`: screenshot, numeral and label, title, summary, tools, links. Laid out as a two-column grid with the second column dropped. |
-| Small hover states, for a mouse only | Underline sweep in the nav, screenshot scale in its frame, whole-row colour in lists, arrow nudge on links, a 2px lift on buttons. A press state confirms every tap. |
-| Few, short motions | One hero entrance, a 240ms fade for each section, a slow pausable strip of work areas, two blinking cursors. All off or reduced to a fade under reduced motion. |
+| Small hover states, for a mouse only | Underline sweep in the nav, screenshot scale in its frame, whole-row colour in lists, arrow nudge on links, a 2px lift on buttons. Buttons have a press state for taps. |
+| Few, short motions | One hero entrance (620ms), a 240ms fade for each section, a slow strip of work areas that pauses under a mouse pointer, two blinking cursors. All off or reduced to a fade under reduced motion. |
 | Terminal as its own place | `/terminal`, full screen, reached from the nav. Boot lines report real facts about this site. Amber, green and mono phosphor themes. Grouped help, aligned project table, inline suggestion, shortcut bar. |
