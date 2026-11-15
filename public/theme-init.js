@@ -10,6 +10,13 @@
     if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
   } catch (e) {}
 
+  // The terminal's phosphor colour and CRT effects (see /terminal).
+  try {
+    var phosphor = localStorage.getItem('phosphor');
+    if (phosphor === 'green' || phosphor === 'mono') root.setAttribute('data-phosphor', phosphor);
+    if (localStorage.getItem('crt') === 'off') root.setAttribute('data-crt', 'off');
+  } catch (e) {}
+
   // The terminal intro plays once per session and never under reduced motion.
   // Its lines are hidden from the first paint so they do not flash before
   // being typed. The timeout shows them anyway if the main script never runs.

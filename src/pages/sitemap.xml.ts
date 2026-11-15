@@ -6,7 +6,7 @@ const escapeXml = (value: string) =>
 
 export const GET: APIRoute = async ({ site }) => {
   const published = (await getWriteups()).filter((entry) => !entry.data.draft);
-  const paths = ['/', '/writeups', '/projects', '/security', ...published.map((entry) => `/writeups/${entry.id}`)];
+  const paths = ['/', '/writeups', '/projects', '/security', '/terminal', ...published.map((entry) => `/writeups/${entry.id}`)];
 
   const urls = paths
     .map((path) => `  <url><loc>${escapeXml(new URL(path, site).href)}</loc></url>`)

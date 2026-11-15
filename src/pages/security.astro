@@ -125,7 +125,7 @@ const origin = Astro.site?.origin ?? '';
 
       <h2 id="terminal">The terminal</h2>
       <p>
-        The terminal on the home page takes typed input, so it is the obvious place to try
+        The <a href="/terminal">terminal</a> takes typed input, so it is the obvious place to try
         something. Whatever you type is written back to the page as text, never as HTML. The output
         of each command is rendered into the page when the site is built, and the script only copies
         those prepared blocks into view. Try <code>echo &lt;img src=x onerror=alert(1)&gt;</code> and
@@ -188,7 +188,7 @@ const origin = Astro.site?.origin ?? '';
       </p>
       <p class="security__aside">
         There are also three flags hidden around this site, in the form <code>FLAG&#123;...&#125;</code>.
-        If you find one, <code>submit</code> it in the terminal on the home page. They are checked in
+        If you find one, <code>submit</code> it in the <a href="/terminal">terminal</a>. They are checked in
         your browser, so they are a game and not a security control.
       </p>
     </div>

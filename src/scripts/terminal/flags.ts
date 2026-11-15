@@ -16,7 +16,9 @@ const DIGESTS: Record<string, string> = {
   notes: '9f1080ce1be8af7e702afd7c07c67f5854863a50abef1840ebbbb84ea5d8c6d1',
 };
 
-const TOTAL = Object.keys(DIGESTS).length;
+/** How many flags there are to find. */
+export const FLAG_COUNT = Object.keys(DIGESTS).length;
+const TOTAL = FLAG_COUNT;
 const STORAGE_KEY = 'flags';
 
 /** The `notes` flag, encoded only so it does not show up in a plain search. */

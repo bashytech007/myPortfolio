@@ -1,4 +1,4 @@
-import { getTheme, setTheme, toggleTheme } from '../theme';
+import { getCrt, getPhosphor, isPhosphor, nextPhosphor, PHOSPHORS, setCrt, setPhosphor } from './display';
 import { notesFlag, submitFlag } from './flags';
 
 /** What a command can do. Implemented by the terminal in index.ts. */
@@ -10,10 +10,14 @@ export interface Shell {
   clear(): void;
   /** Go to a site path or an anchor on the current page. */
   navigate(href: string): void;
+  /** Follow a link: same-origin links navigate, others open in a new tab. */
+  open(href: string): void;
   /** Paths `cat` can print, for example "about.txt" or "projects/x.md". */
   files: string[];
   /** Names `cd` accepts, mapped to where they go. */
   sections: Record<string, string>;
+  /** Project ids `open` accepts, with each project's title and live link. */
+  links: Record<string, { title: string; href: string | null }>;
   history: string[];
 }
 
@@ -38,13 +42,77 @@ function fromTemplate(key: string): Command['run'] {
   };
 }
 
+function fromFile(file: string): Command['run'] {
+  return (_args, shell) => {
+    shell.printTemplate(`template[data-file="${file}"]`);
+  };
+}
+
 export const commands: Record<string, Command> = {
   help: { run: fromTemplate('help') },
+
+  // Portfolio
   whoami: { run: fromTemplate('whoami') },
+  about: { run: fromFile('about.txt') },
+  focus: { run: fromFile('focus.txt') },
   projects: { run: fromTemplate('projects') },
   writeups: { run: fromTemplate('writeups') },
   contact: { run: fromTemplate('contact') },
 
+  open: {
+    complete: (shell) => Object.keys(shell.links),
+    run(args, shell) {
+      // Accept "open projects/name.md" as well as "open name".
+      const id = cleanPath(args[0] ?? '')
+        .replace(/^projects\//, '')
+        .replace(/\.md$/, '');
+      if (!id) {
+        shell.print('usage: open <id>   (run projects for the ids)');
+        return;
+      }
+      const entry = Object.hasOwn(shell.links, id) ? shell.links[id] : undefined;
+      if (!entry) {
+        shell.print(`open: ${args[0]}: no such project. Run projects for the ids.`, 'term-error');
+      } else if (!entry.href) {
+        shell.print(`${entry.title} has no live link.`);
+      } else {
+        shell.print(`Opening ${entry.title}: ${entry.href}`, 'term-dim');
+        shell.open(entry.href);
+      }
+    },
+  },
+
+  // This site
+  headers: { run: fromTemplate('headers') },
+
+  cd: {
+    complete: (shell) => Object.keys(shell.sections).filter((name) => name !== '~'),
+    run(args, shell) {
+      const name = cleanPath(args[0] ?? '') || '~';
+      const href = shell.sections[name === '..' || name === '.' ? '~' : name];
+      if (!href) {
+        const known = Object.keys(shell.sections).filter((key) => key !== '~');
+        shell.print(`cd: ${args[0]}: no such section. Try: ${known.join(', ')}`, 'term-error');
+        return;
+      }
+      shell.print(`Opening ${href}`, 'term-dim');
+      shell.navigate(href);
+    },
+  },
+
+  submit: {
+    async run(args, shell) {
+      shell.print(await submitFlag(args.join(' ')));
+    },
+  },
+
+  // Phase 2: the "break my assistant" challenge. Replace this stub with a
+  // call to a single server endpoint (src/pages/api/chat.ts, with
+  // `export const prerender = false`). Commands may return a promise, so
+  // the fetch can be awaited here and its reply passed to shell.print().
+  chat: { run: fromTemplate('chat') },
+
+  // Shell
   ls: {
     complete: () => DIRECTORIES.map((dir) => `${dir}/`),
     run(args, shell) {
@@ -86,32 +154,39 @@ export const commands: Record<string, Command> = {
     },
   },
 
-  cd: {
-    complete: (shell) => Object.keys(shell.sections).filter((name) => name !== '~'),
+  theme: {
+    complete: () => [...PHOSPHORS],
     run(args, shell) {
-      const name = cleanPath(args[0] ?? '') || '~';
-      const href = shell.sections[name === '..' || name === '.' ? '~' : name];
-      if (!href) {
-        const known = Object.keys(shell.sections).filter((key) => key !== '~');
-        shell.print(`cd: ${args[0]}: no such section. Try: ${known.join(', ')}`, 'term-error');
+      const choice = args[0]?.toLowerCase();
+      if (choice === undefined) nextPhosphor();
+      else if (isPhosphor(choice)) setPhosphor(choice);
+      else {
+        shell.print(`usage: theme [${PHOSPHORS.join('|')}]`);
         return;
       }
-      shell.print(`Opening ${href}`, 'term-dim');
-      shell.navigate(href);
+      shell.print(`Phosphor set to ${getPhosphor()}. It will be remembered on this device.`);
     },
   },
 
-  theme: {
-    complete: () => ['dark', 'light'],
+  crt: {
+    complete: () => ['on', 'off'],
     run(args, shell) {
       const choice = args[0]?.toLowerCase();
-      if (choice === 'dark' || choice === 'light') setTheme(choice);
-      else if (choice === undefined) toggleTheme();
+      if (choice === 'on' || choice === 'off') setCrt(choice === 'on');
+      else if (choice === undefined) setCrt(!getCrt());
       else {
-        shell.print('usage: theme [dark|light]');
+        shell.print('usage: crt [on|off]');
         return;
       }
-      shell.print(`Theme set to ${getTheme()}. It will be remembered on this device.`);
+      shell.print(`Scanlines and glow are ${getCrt() ? 'on' : 'off'}.`);
+    },
+  },
+
+  banner: { run: fromTemplate('banner') },
+
+  history: {
+    run(_args, shell) {
+      shell.history.forEach((line, i) => shell.print(`${String(i + 1).padStart(3)}  ${line}`));
     },
   },
 
@@ -121,15 +196,10 @@ export const commands: Record<string, Command> = {
     },
   },
 
-  // Phase 2: the "break my assistant" challenge. Replace this stub with a
-  // call to a single server endpoint (src/pages/api/chat.ts, with
-  // `export const prerender = false`). Commands may return a promise, so
-  // the fetch can be awaited here and its reply passed to shell.print().
-  chat: { run: fromTemplate('chat') },
-
-  submit: {
-    async run(args, shell) {
-      shell.print(await submitFlag(args.join(' ')));
+  exit: {
+    run(_args, shell) {
+      shell.print('Back to the main site.', 'term-dim');
+      shell.navigate('/');
     },
   },
 
@@ -146,22 +216,10 @@ export const commands: Record<string, Command> = {
       shell.print('/home/visitor');
     },
   },
-  history: {
-    hidden: true,
-    run(_args, shell) {
-      shell.history.forEach((line, i) => shell.print(`${String(i + 1).padStart(3)}  ${line}`));
-    },
-  },
   sudo: {
     hidden: true,
     run(_args, shell) {
       shell.print('visitor is not in the sudoers file.');
-    },
-  },
-  exit: {
-    hidden: true,
-    run(_args, shell) {
-      shell.print('Nothing to exit. Close the tab when you are done.');
     },
   },
 };

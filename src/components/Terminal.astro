@@ -1,15 +1,19 @@
 ---
 /**
- * The home page terminal.
+ * The terminal on /terminal.
  *
- * Everything it can print is rendered here at build time: the session shown
- * on load is ordinary HTML, and the output of every other command sits in a
- * <template>. The script (src/scripts/terminal) only clones those templates,
- * so no content is fetched or built from strings in the browser.
+ * Everything it can print is rendered here at build time: the boot lines and
+ * banner shown on load are ordinary HTML, and the output of every command
+ * sits in a <template>. The script (src/scripts/terminal) only clones those
+ * templates, so no content is fetched or built from strings in the browser.
  */
 import '../styles/terminal.css';
+import pkg from '../../package.json';
+import vercel from '../../vercel.json';
+import { drawBanner } from '../lib/banner';
 import { formatDate, isExternal, type Project, type Writeup } from '../lib/content';
 import { links, sections, site } from '../lib/site';
+import { FLAG_COUNT } from '../scripts/terminal/flags';
 
 interface Props {
   projects: Project[];
@@ -18,86 +22,188 @@ interface Props {
 
 const { projects, writeups } = Astro.props;
 
-// The terminal lists the main builds only; /projects has the full list.
-const listed = projects.filter((p) => !p.data.draft && (p.data.featured || p.data.kind === 'security'));
+const listed = projects.filter((p) => !p.data.draft);
+const published = writeups.filter((w) => !w.data.draft);
 
 const projectFiles = listed.map((p) => `${p.id}.md`);
 const writeupFiles = writeups.map((w) => `${w.id}.md`);
 const rootFiles = ['about.txt', 'contact.txt', 'focus.txt', 'projects/', 'writeups/'];
 const contactLinks = [...links.contact, ...links.social];
+const projectLinks = Object.fromEntries(
+  listed.map((p) => [p.id, { title: p.data.title, href: p.data.live ?? null }]),
+);
 
-const help: [string, string][] = [
-  ['help', 'show this list'],
-  ['whoami', 'who this site belongs to'],
-  ['ls [dir]', 'list files'],
-  ['cat <file>', 'print a file, for example: cat about.txt'],
-  ['cd <section>', 'go to projects, writeups, security or contact'],
-  ['projects', 'list projects'],
-  ['writeups', 'list write-ups'],
-  ['contact', 'how to reach me'],
-  ['theme [dark|light]', 'switch colour theme'],
-  ['clear', 'clear the screen'],
-  ['chat', 'coming soon'],
-  ['submit <flag>', 'check a flag, if you found one'],
+// The boot lines report facts about this build, read from the files that
+// define them, so they cannot drift from what the site actually does.
+const sent = vercel.headers.flatMap((rule) => rule.headers);
+const header = (key: string) => sent.find((h) => h.key === key)?.value ?? '';
+const csp = header('Content-Security-Policy');
+const hstsYears = Math.round(
+  Number(header('Strict-Transport-Security').match(/max-age=(\d+)/)?.[1] ?? 0) / 31_536_000,
+);
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+const boot: [string, string][] = [
+  ['transport', hstsYears > 0 ? `https only, hsts ${plural(hstsYears, 'year')}` : 'https only'],
+  ['policy', csp.split(';')[0]?.trim() ?? ''],
+  ['inline scripts', '0'],
+  ['third-party requests', '0'],
+  ['content', `${plural(listed.length, 'project')}, ${plural(published.length, 'write-up')}`],
 ];
 
-const chips = ['help', 'projects', 'writeups', 'contact', 'theme', 'clear'];
+// The headers `headers` prints: the security ones, in the order they are sent.
+const securityHeaders = [
+  'Content-Security-Policy',
+  'Strict-Transport-Security',
+  'X-Content-Type-Options',
+  'X-Frame-Options',
+  'Referrer-Policy',
+  'Permissions-Policy',
+  'Cross-Origin-Opener-Policy',
+];
+const shownHeaders = sent.filter((h) => securityHeaders.includes(h.key));
+const origin = Astro.site?.origin ?? '';
+
+const art = drawBanner(site.name);
+const CELL = 11; // pixels per dot at full size
+
+const help: { title: string; rows: [string, string][] }[] = [
+  {
+    title: 'Portfolio',
+    rows: [
+      ['whoami', 'who this site belongs to'],
+      ['about', 'the longer version'],
+      ['focus', 'the security work I do'],
+      ['projects', 'list projects'],
+      ['open <id>', "follow a project's live link"],
+      ['writeups', 'list write-ups'],
+      ['contact', 'how to reach me'],
+    ],
+  },
+  {
+    title: 'This site',
+    rows: [
+      ['headers', 'the security headers it sends'],
+      ['cd <section>', 'leave for a page: home, projects, writeups, security'],
+      ['submit <flag>', 'check a flag, if you found one'],
+      ['chat', 'coming soon'],
+    ],
+  },
+  {
+    title: 'Shell',
+    rows: [
+      ['ls [dir]', 'list files'],
+      ['cat <file>', 'print a file, for example: cat about.txt'],
+      ['theme [name]', 'phosphor colour: amber, green or mono'],
+      ['crt [on|off]', 'scanlines and glow'],
+      ['banner', 'print the banner again'],
+      ['history', 'what you have typed'],
+      ['clear', 'clear the screen'],
+      ['exit', 'back to the main site'],
+    ],
+  },
+];
+
+const chips = ['help', 'about', 'projects', 'writeups', 'contact', 'clear'];
 ---
 
-<section class="terminal" aria-label="Terminal" data-terminal data-sections={JSON.stringify(sections)}>
-  <div class="terminal__bar">
-    <span class="terminal__dots" aria-hidden="true"><i></i><i></i><i></i></span>
-    <p class="terminal__title">visitor@{site.handle}: ~</p>
-    <button type="button" class="terminal__skip" data-term-skip hidden>Skip intro</button>
-  </div>
+<section
+  class="tty"
+  aria-label="Terminal"
+  data-terminal
+  data-sections={JSON.stringify(sections)}
+  data-links={JSON.stringify(projectLinks)}
+>
+  <header class="tty__bar">
+    <a class="tty__back" href="/">
+      <span aria-hidden="true">&larr;</span>
+      {site.name}
+    </a>
+    <p class="tty__title" aria-hidden="true">visitor@{site.handle}: ~</p>
+    <button type="button" class="tty__skip" data-term-skip hidden>Skip intro</button>
+  </header>
 
-  <div class="terminal__screen" data-term-screen tabindex="0" role="group" aria-label="Terminal output">
-    <div data-term-session>
-      <div class="term-entry" data-term-intro>
-        <p class="term-line">
-          <span class="term-prompt" aria-hidden="true">$</span>
-          <span class="visually-hidden">Command:</span>
-          <span class="term-cmd">whoami</span>
+  <div class="tty__frame">
+    <div class="tty__screen" data-term-screen tabindex="0" role="group" aria-label="Terminal output">
+      <div data-term-session>
+        <p class="term-dim" data-term-intro>
+          {pkg.name}
+          {pkg.version} / static build / astro {pkg.dependencies.astro}
         </p>
-        <div class="term-out">
-          <p>{site.whoami}</p>
+        {
+          boot.map(([name, value]) => (
+            <p class="term-boot" data-term-intro>
+              <span>{name}</span>
+              <span class="term-boot__dots" aria-hidden="true" />
+              <span>{value}</span>
+              <span class="term-ok">ok</span>
+            </p>
+          ))
+        }
+        <p class="term-dim" data-term-intro="350">
+          note: {plural(FLAG_COUNT, 'flag')} hidden on this site. Not every command is listed.
+        </p>
+
+        <div class="term-id" data-term-intro="200">
+          {
+            art && (
+              <svg
+                class="term-banner"
+                viewBox={`0 0 ${art.width} ${art.height}`}
+                width={art.width * CELL}
+                height={art.height * CELL}
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d={art.path} />
+              </svg>
+            )
+          }
+          <p class="term-bright">{site.name}</p>
+          <p>{site.roles.join(' / ')}</p>
+          <p class="term-dim">{site.location}</p>
         </div>
+
+        <p class="term-bright term-hint" data-term-intro>Type help to get started.</p>
       </div>
 
-      <div class="term-entry" data-term-intro>
-        <p class="term-line">
-          <span class="term-prompt" aria-hidden="true">$</span>
-          <span class="visually-hidden">Command:</span>
-          <span class="term-cmd">cat about.txt</span>
-        </p>
-        <div class="term-out term-text">
-          {site.about.map((paragraph) => <p>{paragraph}</p>)}
-        </div>
-      </div>
+      <div class="tty__log" data-term-log role="log" aria-label="Command output"></div>
 
-      <div class="term-entry" data-term-intro>
-        <p class="term-line">
-          <span class="term-prompt" aria-hidden="true">$</span>
-          <span class="visually-hidden">Command:</span>
-          <span class="term-cmd">ls projects/</span>
-        </p>
-        <div class="term-out">
-          <ul class="term-ls">
-            {projectFiles.map((file) => <li>{file}</li>)}
-          </ul>
-        </div>
-      </div>
+      <p class="tty__nojs">
+        The live prompt needs JavaScript. Everything it prints is also on the
+        <a href="/">main site</a>: <a href="/projects">projects</a>,
+        <a href="/writeups">write-ups</a> and <a href="/#contact">contact</a>.
+      </p>
+
+      <form class="tty__prompt" data-term-form>
+        <label class="term-ps1" for="term-input" data-term-ps1>
+          <span class="term-ps1__host" aria-hidden="true">visitor@{site.handle}:</span>
+          <span aria-hidden="true">~$</span>
+          <span class="visually-hidden">Terminal command. Type help for a list.</span>
+        </label>
+        <span class="term-cursor" aria-hidden="true"></span>
+        <span class="term-field">
+          <span class="term-ghost" data-term-ghost aria-hidden="true"></span>
+          <input
+            id="term-input"
+            class="term-input"
+            data-term-input
+            type="text"
+            name="command"
+            placeholder="type help and press Enter"
+            autocomplete="off"
+            autocapitalize="none"
+            autocorrect="off"
+            spellcheck="false"
+            enterkeyhint="go"
+            maxlength="200"
+          />
+        </span>
+      </form>
     </div>
-
-    <div class="terminal__log" data-term-log role="log" aria-label="Command output"></div>
   </div>
 
-  <p class="terminal__nojs">
-    The live prompt needs JavaScript. Everything it prints is also on this page and in the navigation
-    above.
-  </p>
-
-  <div class="terminal__chips" data-term-chips role="group" aria-label="Run a command">
+  <div class="tty__chips" data-term-chips role="group" aria-label="Run a command">
     {
       chips.map((command) => (
         <button type="button" class="term-chip" data-run={command}>
@@ -107,49 +213,72 @@ const chips = ['help', 'projects', 'writeups', 'contact', 'theme', 'clear'];
     }
   </div>
 
-  <form class="terminal__prompt" data-term-form>
-    <label class="term-prompt" for="term-input">
-      <span aria-hidden="true">$</span>
-      <span class="visually-hidden">Terminal command. Type help for a list.</span>
-    </label>
-    <span class="term-cursor" aria-hidden="true"></span>
-    <input
-      id="term-input"
-      class="term-input"
-      data-term-input
-      type="text"
-      name="command"
-      placeholder="type help and press Enter"
-      autocomplete="off"
-      autocapitalize="none"
-      autocorrect="off"
-      spellcheck="false"
-      enterkeyhint="go"
-      maxlength="200"
-    />
-  </form>
-
   {/* Command output, cloned by the script. */}
   <template data-out="help">
-    <dl class="term-dl term-dl--help">
-      {
-        help.map(([usage, description]) => (
-          <div>
-            <dt>{usage}</dt>
-            <dd>{description}</dd>
-          </div>
-        ))
-      }
-    </dl>
-    <p class="term-dim">Tab completes a command. Up and down arrows step through history.</p>
+    {
+      help.map((group) => (
+        <>
+          <p class="term-head">{group.title}</p>
+          <dl class="term-dl term-dl--help">
+            {group.rows.map(([usage, description]) => (
+              <div>
+                <dt>{usage}</dt>
+                <dd>{description}</dd>
+              </div>
+            ))}
+          </dl>
+        </>
+      ))
+    }
+    <p class="term-dim term-gap">
+      Tab or the right arrow accepts the dim suggestion. Up and down step through history.
+    </p>
   </template>
 
   <template data-out="whoami">
     <p>{site.whoami}</p>
   </template>
 
+  <template data-out="banner">
+    <div class="term-id">
+      {
+        art && (
+          <svg
+            class="term-banner"
+            viewBox={`0 0 ${art.width} ${art.height}`}
+            width={art.width * CELL}
+            height={art.height * CELL}
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d={art.path} />
+          </svg>
+        )
+      }
+      <p class="term-bright">{site.name}</p>
+      <p>{site.roles.join(' / ')}</p>
+      <p class="term-dim">{site.location}</p>
+    </div>
+  </template>
+
   <template data-out="chat">
     <p>Coming soon.</p>
+  </template>
+
+  <template data-out="headers">
+    <dl class="term-dl term-dl--stack">
+      {
+        shownHeaders.map((h) => (
+          <div>
+            <dt>{h.key}</dt>
+            <dd>{h.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+    <p class="term-dim term-gap">
+      Check them yourself: curl -sI {origin}/ . What each one does: <a href="/security">/security</a>
+    </p>
   </template>
 
   <template data-out="ls:">
@@ -185,20 +314,20 @@ const chips = ['help', 'projects', 'writeups', 'contact', 'theme', 'clear'];
   </template>
 
   <template data-out="projects">
-    <ul class="term-list">
+    <p class="term-dim">open &lt;id&gt; follows the live link. cat projects/&lt;id&gt;.md prints the entry.</p>
+    <ul class="term-table term-gap">
       {
         listed.map((p) => (
           <li>
-            <a href={p.data.live ?? '/projects'} rel={p.data.live && isExternal(p.data.live) ? 'noopener noreferrer' : undefined}>
-              {p.data.title}
-            </a>
-            <span class="term-dim">[{p.data.kind}]</span>
-            <p>{p.data.summary}</p>
+            <span class="term-bright">{p.id}</span>
+            <span>{p.data.title}</span>
+            <span class="term-dim">{p.data.kind}</span>
+            <span class="term-dim">{p.data.tags.join(', ')}</span>
           </li>
         ))
       }
     </ul>
-    <p class="term-dim">Full list: <a href="/projects">/projects</a></p>
+    <p class="term-dim term-gap">With screenshots: <a href="/projects">/projects</a></p>
   </template>
 
   <template data-out="writeups">
@@ -217,7 +346,7 @@ const chips = ['help', 'projects', 'writeups', 'contact', 'theme', 'clear'];
         <p>No write-ups published yet.</p>
       )
     }
-    <p class="term-dim">All write-ups: <a href="/writeups">/writeups</a></p>
+    <p class="term-dim term-gap">All write-ups: <a href="/writeups">/writeups</a></p>
   </template>
 
   <template data-out="contact" data-file="contact.txt">
@@ -244,16 +373,17 @@ const chips = ['help', 'projects', 'writeups', 'contact', 'theme', 'clear'];
   </template>
 
   <template data-file="focus.txt">
-    <ul class="term-list">
+    <ol class="term-list">
       {
-        site.focus.map((item) => (
+        site.focus.map((item, i) => (
           <li>
+            <span class="term-dim">{String(i + 1).padStart(2, '0')}</span>
             <strong>{item.title}</strong>
             <p>{item.body}</p>
           </li>
         ))
       }
-    </ul>
+    </ol>
   </template>
 
   {

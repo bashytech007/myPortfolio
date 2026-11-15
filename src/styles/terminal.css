@@ -1,124 +1,268 @@
-/* The terminal window on the home page. Global (not scoped) because the
-   script adds output lines at runtime. Everything is namespaced.
+/* The /terminal page: one screen, the whole viewport. Global (not scoped)
+   because the script adds output lines at runtime. Everything is namespaced
+   under .term-page, .tty or .term-*.
 
-   A parent can size the window by setting --term-pad, --term-size,
-   --term-height (a fixed window height) and --term-screen-max. */
+   Colour is one hue at three brightness levels: dim for boot lines and
+   hints, normal for output, bright for what was typed and for headings.
+   A theme swaps the hue and keeps the levels. */
 
-.terminal {
-  --_pad: var(--term-pad, var(--s-2));
-  position: relative;
+.term-page {
+  --ph: #ffb454;
+  --ph-dim: #b9803f;
+  --ph-bright: #ffe6c4;
+  --ph-bg: #070503;
+  --ph-screen: #0d0a06;
+  --ph-edge: rgb(255 180 84 / 0.3);
+  --ph-glow: rgb(255 180 84 / 0.3);
+  --tty-pad: 1rem;
+
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--ph-bg);
+  color: var(--ph);
+  color-scheme: dark;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-variant-ligatures: none;
+  line-height: 1.65;
+}
+
+[data-phosphor='green'] .term-page {
+  --ph: #6af08f;
+  --ph-dim: #3fa35f;
+  --ph-bright: #d8ffe3;
+  --ph-bg: #030604;
+  --ph-screen: #070c08;
+  --ph-edge: rgb(106 240 143 / 0.28);
+  --ph-glow: rgb(106 240 143 / 0.28);
+}
+
+[data-phosphor='mono'] .term-page {
+  --ph: #d5d9de;
+  --ph-dim: #8c939c;
+  --ph-bright: #ffffff;
+  --ph-bg: #050506;
+  --ph-screen: #0b0c0d;
+  --ph-edge: rgb(213 217 222 / 0.26);
+  --ph-glow: rgb(213 217 222 / 0.2);
+}
+
+/* The page behind the body, for overscroll and the browser chrome. */
+html:has(.term-page) {
+  background: #070503;
+}
+
+.term-page main {
   display: flex;
   flex-direction: column;
-  height: var(--term-height, auto);
-  /* The frame catches a little of the accent. */
-  border: var(--hairline) solid color-mix(in srgb, var(--accent) 26%, var(--border));
-  border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: var(--shadow-window);
-  font-family: var(--font-mono);
-  font-size: var(--term-size, 0.8125rem);
-  font-variant-ligatures: none;
-  line-height: 1.7;
-  overflow: hidden;
-  transition:
-    border-color 120ms var(--ease),
-    box-shadow 120ms var(--ease);
+  min-height: 0;
 }
 
-/* Focus style for the prompt: the window frame takes the full accent. */
-.terminal:has(.term-input:focus-visible) {
-  border-color: var(--accent);
-  box-shadow:
-    0 0 0 1px var(--accent),
-    var(--shadow-window);
+.term-page ::selection {
+  background: var(--ph);
+  color: var(--ph-screen);
 }
 
-/* Title bar */
+.term-page :focus-visible {
+  outline-color: var(--ph-bright);
+}
 
-.terminal__bar {
+.term-page a {
+  color: var(--ph-bright);
+  text-decoration-color: var(--ph-dim);
+}
+
+.term-page a:hover {
+  color: var(--ph-bright);
+  text-decoration-color: currentColor;
+}
+
+/* Frame --------------------------------------------------------------------- */
+
+.tty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+  padding: 0.5rem;
+}
+
+.tty__bar {
   flex: none;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: var(--s-2);
-  height: 2.875rem;
-  padding-inline: var(--_pad);
-  border-block-end: var(--hairline) solid var(--border);
-  background: var(--surface-2);
-  box-shadow: 0 1px 0 var(--bar-highlight) inset;
-  color: var(--muted);
+  min-height: 2rem;
+  padding-inline: 0.5rem;
+  color: var(--ph-dim);
   font-size: var(--text-xs);
   line-height: 1;
 }
 
-.terminal__dots {
-  display: flex;
+.term-page .tty__back {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
   gap: 0.5rem;
+  min-height: 2rem;
+  color: var(--ph-dim);
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-/* Window buttons: filled, in muted tones so the accent stays the only
-   strong colour on the page. */
-.terminal__dots i {
-  width: 0.6875rem;
-  height: 0.6875rem;
-  border-radius: 50%;
-  background: var(--dot-close);
+.term-page .tty__back:hover {
+  color: var(--ph-bright);
 }
 
-.terminal__dots i:nth-child(2) {
-  background: var(--dot-min);
-}
-
-.terminal__dots i:nth-child(3) {
-  background: var(--dot-max);
-}
-
-.terminal__title {
+.tty__title {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.terminal__skip {
+.tty__skip {
+  grid-column: 3;
   justify-self: end;
   min-height: 2rem;
-  margin-inline-end: calc(var(--s-1) * -1);
-  padding: 0 var(--s-1);
+  padding: 0 0.25rem;
   border: 0;
-  border-radius: var(--radius);
   background: transparent;
-  color: var(--muted);
+  color: var(--ph-dim);
   font-family: inherit;
   font-size: inherit;
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
 
-.terminal__skip:hover {
-  color: var(--text);
+.tty__skip:hover {
+  color: var(--ph-bright);
 }
 
-/* Output */
-
-.terminal__screen {
-  flex: 0 1 auto;
+/* The screen's bezel: a hairline in the phosphor colour, a soft glow outside
+   and a darker edge inside. */
+.tty__frame {
+  position: relative;
+  flex: 1;
+  display: flex;
   min-height: 0;
-  max-height: var(--term-screen-max, min(34rem, 70vh));
-  padding: var(--_pad) var(--_pad) 0;
+  border: var(--hairline) solid var(--ph-edge);
+  border-radius: 14px;
+  background: var(--ph-screen);
+  box-shadow:
+    0 0 28px -8px var(--ph-glow),
+    inset 0 0 72px rgb(0 0 0 / 0.55);
+  overflow: hidden;
+  transition: border-color 200ms var(--ease);
+}
+
+.tty__frame:has(.term-input:focus-visible) {
+  border-color: var(--ph-dim);
+}
+
+/* Scanlines and a vignette, drawn over the text and never in its way. */
+.tty__frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 2px, rgb(0 0 0 / 0.16) 2px 3px),
+    radial-gradient(ellipse at center, transparent 55%, rgb(0 0 0 / 0.35));
+  pointer-events: none;
+}
+
+.tty__screen {
+  flex: 1;
+  min-width: 0;
+  padding: var(--tty-pad);
   overflow-y: auto;
+  overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-color: var(--ph-dim) transparent;
+  text-shadow: 0 0 9px var(--ph-glow);
 }
 
-@supports (height: 1svh) {
-  .terminal__screen {
-    max-height: var(--term-screen-max, min(34rem, 70svh));
-  }
+.tty__screen:focus-visible {
+  outline-offset: -4px;
+  border-radius: 14px;
 }
 
-.terminal__screen:focus-visible {
-  outline-offset: -3px;
-  border-radius: var(--radius);
+/* `crt off` removes the effects and leaves plain text on a plain screen. */
+[data-crt='off'] .tty__frame {
+  box-shadow: none;
+}
+
+[data-crt='off'] .tty__frame::after {
+  content: none;
+}
+
+[data-crt='off'] .tty__screen {
+  text-shadow: none;
+}
+
+[data-crt='off'] .term-banner {
+  filter: none;
+}
+
+/* Output -------------------------------------------------------------------- */
+
+.term-dim {
+  color: var(--ph-dim);
+}
+
+.term-bright,
+.term-out strong {
+  color: var(--ph-bright);
+  font-weight: 600;
+}
+
+.term-error {
+  color: var(--ph-bright);
+}
+
+.term-ok {
+  color: var(--ph);
+}
+
+.term-gap {
+  margin-block-start: var(--s-1);
+}
+
+/* Boot lines: name, a dotted leader, value, ok. */
+.term-boot {
+  display: flex;
+  align-items: baseline;
+  gap: 1ch;
+  max-width: 62ch;
+  color: var(--ph-dim);
+}
+
+.term-boot__dots {
+  flex: 1;
+  min-width: 2ch;
+  border-block-end: 1px dotted currentColor;
+  opacity: 0.55;
+  transform: translateY(-0.3em);
+}
+
+/* The name as dot-matrix capitals, then who and where. */
+.term-id {
+  margin-block: var(--s-3) var(--s-2);
+}
+
+.term-banner {
+  max-width: 100%;
+  height: auto;
+  margin-block-end: var(--s-2);
+  fill: var(--ph);
+  filter: drop-shadow(0 0 5px var(--ph-glow));
+}
+
+.term-hint {
+  margin-block-end: var(--s-2);
 }
 
 .term-entry {
@@ -128,15 +272,21 @@
 .term-line {
   display: flex;
   gap: 1ch;
-  color: var(--text);
-  font-weight: 500;
+  color: var(--ph-bright);
+  font-weight: 600;
 }
 
-.term-prompt {
+/* The prompt, in front of the input and in front of each echoed command. */
+.term-ps1 {
   flex: none;
-  color: var(--accent);
-  font-weight: 600;
+  color: var(--ph-dim);
+  font-weight: 400;
+  white-space: nowrap;
   user-select: none;
+}
+
+.term-ps1__host {
+  display: none;
 }
 
 .term-cmd {
@@ -147,20 +297,11 @@
 
 .term-out {
   margin-block-start: 0.125rem;
-  color: var(--text);
   overflow-wrap: anywhere;
 }
 
 .term-out p {
   max-width: 78ch;
-}
-
-.term-out a {
-  font-weight: 500;
-}
-
-.term-out strong {
-  font-weight: 600;
 }
 
 .term-text > p + p {
@@ -169,14 +310,6 @@
 
 .term-text a + a {
   margin-inline-start: 2ch;
-}
-
-.term-dim {
-  color: var(--muted);
-}
-
-.term-error {
-  color: var(--text);
 }
 
 .term-ls {
@@ -189,11 +322,19 @@
   margin-block-start: var(--s-1);
 }
 
-.term-list + p,
-.term-dl + p {
-  margin-block-start: var(--s-1);
+/* Group heading in `help`. */
+.term-head {
+  color: var(--ph-bright);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
+.term-dl + .term-head {
+  margin-block-start: var(--s-2);
+}
+
+/* Two aligned columns: name, then value. */
 .term-dl > div {
   display: grid;
   grid-template-columns: 10ch minmax(0, 1fr);
@@ -201,37 +342,71 @@
 }
 
 .term-dl dt {
-  color: var(--muted);
+  color: var(--ph-dim);
 }
 
 .term-dl--help > div {
-  grid-template-columns: 1fr;
-  margin-block-end: 0.25rem;
+  grid-template-columns: 15ch minmax(0, 1fr);
+  padding-inline-start: 2ch;
 }
 
 .term-dl--help dt {
-  color: var(--text);
-  font-weight: 500;
+  color: var(--ph);
 }
 
 .term-dl--help dd {
-  color: var(--muted);
+  color: var(--ph-dim);
 }
 
-/* Cursor: a blinking block while the intro types and while the prompt is
-   empty, focused or not. Once something is typed the native caret takes
-   over, as a block where the browser supports caret-shape. */
+/* Name on one line, value indented under it. For long values. */
+.term-dl--stack > div {
+  display: block;
+}
+
+.term-dl--stack > div + div {
+  margin-block-start: var(--s-1);
+}
+
+.term-dl--stack dt {
+  color: var(--ph-bright);
+}
+
+.term-dl--stack dd {
+  max-width: 76ch;
+  padding-inline-start: 2ch;
+}
+
+/* The project list. On a phone each entry is two lines; from 48rem it is a
+   table with aligned columns. */
+.term-table > li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 2ch;
+}
+
+.term-table > li + li {
+  margin-block-start: 0.375rem;
+}
+
+.term-table > li > :nth-child(1),
+.term-table > li > :nth-child(4) {
+  grid-column: 1 / -1;
+}
+
+.term-table > li > :nth-child(4) {
+  display: none;
+}
+
+/* Cursor: a blinking block while the prompt is empty, focused or not. Once
+   something is typed the native caret takes over, as a block where the
+   browser supports caret-shape. */
 
 .term-cursor {
   flex: none;
   width: 0.6em;
   height: 1.15em;
-  background: var(--accent);
-}
-
-.term-line .term-cursor {
-  align-self: center;
-  margin-inline-start: -0.6ch;
+  background: var(--ph);
+  box-shadow: 0 0 9px var(--ph-glow);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -246,87 +421,88 @@
   }
 }
 
-/* Prompt */
+/* Prompt -------------------------------------------------------------------- */
 
-.terminal__nojs {
-  flex: none;
-  padding: 0 var(--_pad) var(--_pad);
-  color: var(--muted);
+.tty__nojs {
+  max-width: 78ch;
+  color: var(--ph-dim);
 }
 
-.js .terminal__nojs,
-html:not(.js) .terminal__chips,
-html:not(.js) .terminal__prompt {
+.js .tty__nojs,
+html:not(.js) .tty__chips,
+html:not(.js) .tty__prompt {
   display: none;
 }
 
-.terminal__chips {
-  flex: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-1);
-  padding: var(--s-1) var(--_pad) 0;
-}
-
-.term-chip {
-  min-height: 2.5rem;
-  padding: 0 0.875rem;
-  border: var(--hairline) solid var(--border-strong);
-  border-radius: var(--radius);
-  background: var(--surface-2);
-  color: var(--text);
-  font-family: inherit;
-  font-size: var(--text-sm);
-  line-height: 1;
-}
-
-.term-chip:hover {
-  border-color: var(--text);
-}
-
-.term-chip:focus-visible {
-  border-radius: var(--radius);
-}
-
-.terminal__prompt {
-  flex: none;
+.tty__prompt {
   display: flex;
   align-items: center;
   gap: 1ch;
-  padding: var(--s-1) var(--_pad) calc(var(--_pad) - 0.25rem);
 }
 
-.terminal__prompt .term-prompt {
+.tty__prompt .term-ps1 {
   cursor: text;
 }
 
+.term-field {
+  position: relative;
+  flex: 1;
+  display: flex;
+  min-width: 0;
+}
+
+.term-input,
+.term-ghost {
+  font-family: inherit;
+  /* 16px stops iOS zooming the page when the input takes focus. */
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 2.5rem;
+  letter-spacing: 0;
+}
+
 .term-input {
+  position: relative;
   flex: 1;
   min-width: 0;
-  min-height: 2.5rem;
+  height: 2.5rem;
   padding: 0;
   border: 0;
   border-radius: 0;
   outline: none;
   background: transparent;
-  color: var(--text);
-  caret-color: var(--accent);
+  color: var(--ph-bright);
+  caret-color: var(--ph);
   caret-shape: block;
-  font-family: inherit;
-  /* 16px stops iOS zooming the page when the input takes focus. */
-  font-size: 1rem;
-  font-weight: 500;
+  text-shadow: inherit;
 }
 
 .term-input::placeholder {
-  color: var(--muted);
+  color: var(--ph-dim);
   font-weight: 400;
   opacity: 1;
 }
 
+/* The suggestion sits under the input, in the same type, so its first
+   character lands exactly after the last one typed. */
+.term-ghost {
+  position: absolute;
+  inset: 0;
+  color: var(--ph-dim);
+  font-weight: 400;
+  white-space: pre;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.term-ghost__typed {
+  font-weight: 600;
+  visibility: hidden;
+}
+
 /* The block cursor shows while the prompt is empty. The native caret is
    hidden for that moment so there are never two cursors. */
-.terminal__prompt:has(.term-input:not(:placeholder-shown)) .term-cursor {
+.tty__prompt:has(.term-input:not(:placeholder-shown)) .term-cursor {
   display: none;
 }
 
@@ -334,34 +510,107 @@ html:not(.js) .terminal__prompt {
   caret-color: transparent;
 }
 
-/* Intro: lines stay hidden (but keep their space) until they are typed. */
+/* Shortcut buttons under the screen: the main way in on a touch screen. */
+
+.tty__chips {
+  flex: none;
+  display: flex;
+  gap: 0.5rem;
+  padding-block-end: env(safe-area-inset-bottom);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.term-chip {
+  flex: 1 0 auto;
+  min-height: 2.5rem;
+  padding: 0 0.875rem;
+  border: var(--hairline) solid var(--ph-edge);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ph-dim);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  line-height: 1;
+  transition:
+    border-color 160ms var(--ease),
+    color 160ms var(--ease),
+    background-color 160ms var(--ease);
+}
+
+.term-chip:hover,
+.term-chip:focus-visible {
+  border-color: var(--ph);
+  color: var(--ph-bright);
+}
+
+.term-chip:active {
+  background: var(--ph-edge);
+}
+
+/* Intro: lines stay hidden (but keep their space) until they are shown. */
 
 .intro-pending [data-term-intro],
 .term-wait {
   visibility: hidden;
 }
 
-/* Larger screens: keyboard first, so the chips are not needed. */
+/* Larger screens ------------------------------------------------------------ */
 
-@media (min-width: 48rem) {
-  .terminal {
-    --_pad: var(--term-pad, var(--s-3));
-    font-size: var(--term-size, 0.875rem);
-  }
-
-  .term-dl--help > div {
-    grid-template-columns: 21ch minmax(0, 1fr);
-    margin-block-end: 0;
-  }
-
-  .term-input {
-    min-height: 2rem;
-    font-size: var(--term-size, 0.875rem);
+@media (min-width: 30rem) {
+  .term-ps1__host {
+    display: inline;
   }
 }
 
-@media (min-width: 48rem) and (hover: hover) and (pointer: fine) {
-  .terminal__chips {
-    display: none;
+@media (min-width: 48rem) {
+  .term-page {
+    --tty-pad: 1.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .tty {
+    gap: 0.625rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .term-input,
+  .term-ghost {
+    font-size: inherit;
+    line-height: 2rem;
+  }
+
+  .term-input {
+    height: 2rem;
+  }
+
+  .term-dl--help > div {
+    grid-template-columns: 17ch minmax(0, 1fr);
+  }
+
+  .term-table > li {
+    grid-template-columns: 25ch minmax(0, 30ch) 12ch minmax(0, 1fr);
+  }
+
+  .term-table > li + li {
+    margin-block-start: 0;
+  }
+
+  .term-table > li > :nth-child(1),
+  .term-table > li > :nth-child(4) {
+    grid-column: auto;
+  }
+
+  .term-table > li > :nth-child(4) {
+    display: inline;
+  }
+
+  .tty__chips {
+    gap: 0.5rem;
+  }
+
+  .term-chip {
+    flex: none;
+    min-height: 1.875rem;
   }
 }

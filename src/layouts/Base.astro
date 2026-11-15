@@ -15,6 +15,8 @@ interface Props {
   noindex?: boolean;
   /** Class for <body>, for page-level layout hooks. */
   bodyClass?: string;
+  /** Leave out the site header and footer. Used by the terminal page. */
+  bare?: boolean;
 }
 
 const {
@@ -23,6 +25,7 @@ const {
   ogType = 'website',
   noindex = false,
   bodyClass,
+  bare = false,
 } = Astro.props;
 
 const pageTitle = title ? `${title} | ${site.name}` : `${site.name} | ${site.role}`;
@@ -58,11 +61,11 @@ const ogImage = new URL('/og.png', Astro.site).href;
   </head>
   <body class={bodyClass}>
     <a class="skip-link" href="#main">Skip to content</a>
-    <Header />
+    {!bare && <Header />}
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    <Footer />
+    {!bare && <Footer />}
     <script>
       import '../scripts/main';
     </script>
