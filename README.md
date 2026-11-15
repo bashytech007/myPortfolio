@@ -44,10 +44,19 @@ Nothing below needs a component change.
 | Name, headline, about text | `src/content/site.json`                 |
 | Roles above the name       | `src/content/site.json` (`roles`)       |
 | Strip under the hero       | `src/content/site.json` (`disciplines`, `credentials`) |
+| Experience timeline        | `src/content/site.json` (`experience`)  |
 | Focus areas                | `src/content/site.json` (`focus`)       |
 | Email and profile links    | `src/content/links.json`                |
 | Projects                   | `src/content/projects/*.md`             |
 | Write-ups                  | `src/content/writeups/*.md`             |
+
+### Add a role to the timeline
+
+Add an entry to `experience` in `src/content/site.json`, newest first, with
+`role`, `org` and `start` (`"YYYY-MM"`). Leave `end` out while the role is
+current: it is then shown as "Present", and its organisation is listed under
+"Currently" in the hero and the about facts. The terminal's `experience`
+command prints the same list.
 
 ### Add a write-up
 
