@@ -1,8 +1,12 @@
 # Bashir Aremu: portfolio
 
 A static [Astro](https://astro.build) site positioned around application
-security and AI red teaming. The home page has an interactive terminal; the
-rest is ordinary pages.
+security, DevSecOps and full-stack work. The main site is editorial: a large
+name, numbered sections and a screenshot-led project grid. The terminal is a
+separate full-screen page at `/terminal`, linked from the navigation.
+
+The design principles behind it are written down in
+[`docs/design-notes.md`](docs/design-notes.md).
 
 ## Run it locally
 
@@ -38,7 +42,8 @@ Nothing below needs a component change.
 | What                       | Where                                   |
 | -------------------------- | --------------------------------------- |
 | Name, headline, about text | `src/content/site.json`                 |
-| Hero label and chips       | `src/content/site.json` (`disciplines`, `credentials`) |
+| Roles above the name       | `src/content/site.json` (`roles`)       |
+| Strip under the hero       | `src/content/site.json` (`disciplines`, `credentials`) |
 | Focus areas                | `src/content/site.json` (`focus`)       |
 | Email and profile links    | `src/content/links.json`                |
 | Projects                   | `src/content/projects/*.md`             |
@@ -57,8 +62,16 @@ message naming the file if one is missing or renamed.
 
 Add a Markdown file to `src/content/projects/`. Set `kind` to `security` or
 `development`. Give it an `image` (a screenshot in
-`src/content/projects/images/`) to show it as a card; without one it is listed
-under "Earlier builds". Set `featured: true` to show it on the home page.
+`src/content/projects/images/`, 16:10 works best) to show it as a card in the
+grid; without one a development project is listed in the numbered index under
+"Earlier builds". Set `featured: true` to show it on the home page, which only
+takes projects that have a screenshot.
+
+A card with no screenshot shows a hatched frame reading "TODO: add a
+screenshot". Today only the draft security tool does.
+
+The file name is the project's id in the terminal (`open <id>`,
+`cat projects/<id>.md`).
 
 ### Drafts
 
@@ -72,25 +85,45 @@ deployment), set `SHOW_DRAFTS=true`.
 src/
   content/          site copy, projects and write-ups
   content.config.ts collection schemas
-  layouts/Base.astro  <head>, navigation, footer
-  components/       Header, Footer, Terminal, cards and lists
-  pages/            /, /writeups, /projects, /security, 404, robots.txt, sitemap.xml
+  layouts/Base.astro  <head>, navigation, footer (both left out with `bare`)
+  components/       Header, Footer, SectionHead, ProjectCard, lists, Terminal
+  lib/              content queries, site data, the terminal banner
+  pages/            /, /writeups, /projects, /security, /terminal, 404,
+                    robots.txt, sitemap.xml
   scripts/          theme, navigation, scroll reveal, terminal (TypeScript, no framework)
   styles/           global.css (tokens, type, layout), terminal.css
+docs/               design-notes.md
 public/             theme-init.js, favicon, og.png
 scripts/            preview server, build verification, contrast check
 vercel.json         response headers
 ```
 
+### The main site
+
+Every home page section opens with `SectionHead.astro`: a rule, a numbered
+label and a statement. The numbers are counted in `src/pages/index.astro`, so
+a section that is not shown (write-ups, until one is published) does not
+leave a gap. Colours, the type scale and spacing are tokens at the top of
+`src/styles/global.css`; `npm run contrast` checks the colours.
+
 ### The terminal
 
-`src/components/Terminal.astro` renders the session shown on load and the
-output of every command at build time (inside `<template>` elements). The
-script in `src/scripts/terminal/` clones those templates. Typed input is only
-ever written to the page with `textContent`.
+`/terminal` is the whole screen, with no site header or footer.
+`src/components/Terminal.astro` renders the boot lines and banner shown on
+load and the output of every command at build time (inside `<template>`
+elements). The script in `src/scripts/terminal/` clones those templates. Typed
+input is only ever written to the page with `textContent`.
 
-Commands live in `src/scripts/terminal/commands.ts`. Each one can return a
-promise.
+- Commands live in `src/scripts/terminal/commands.ts`. Each one can return a
+  promise. To list a new one in `help`, add it to the `help` groups in
+  `Terminal.astro`.
+- The boot lines are facts read from `vercel.json` and `package.json`, and
+  `headers` prints the security headers from `vercel.json`, so neither can
+  drift from what the site sends.
+- The name banner is drawn by `src/lib/banner.ts` from `name` in `site.json`.
+- `theme amber|green|mono` and `crt on|off` are stored on the device and
+  applied before first paint by `public/theme-init.js`. The colours are at
+  the top of `src/styles/terminal.css`.
 
 ### Phase 2: the chat challenge
 
@@ -149,6 +182,14 @@ been merged.
 
 `public/og.png` is rendered from `scripts/og-image.html`. The command to
 regenerate it is at the top of that file.
+
+The screenshot on the "This site" project card
+(`src/content/projects/images/this-site.png`) is the home page at 1440x900.
+Retake it the same way after a visible change to the hero:
+
+```bash
+chrome --headless --hide-scrollbars --window-size=1440,900   --virtual-time-budget=8000   --screenshot=src/content/projects/images/this-site.png http://localhost:4321/
+```
 
 ## Fonts
 
