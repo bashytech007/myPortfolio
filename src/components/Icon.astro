@@ -1,0 +1,43 @@
+---
+/**
+ * Small single-colour line icons, drawn inline so they take the text colour
+ * and need no extra request. Decorative: always paired with a text label.
+ */
+const paths = {
+  target: 'M12 4.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15zM12 2v5M12 17v5M2 12h5M17 12h5',
+  chip: 'M8.5 6.5h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2zM10.5 10.5h3v3h-3zM9.5 2.5v4M14.5 2.5v4M9.5 17.5v4M14.5 17.5v4M2.5 9.5h4M2.5 14.5h4M17.5 9.5h4M17.5 14.5h4',
+  shield: 'M12 2.8l7.5 2.7v5.8c0 4.6-3 8.1-7.5 9.9-4.5-1.8-7.5-5.3-7.5-9.9V5.5zM8.8 12.2l2.3 2.3 4.2-4.6',
+  code: 'M8.5 7.5L4 12l4.5 4.5M15.5 7.5L20 12l-4.5 4.5M13.5 5l-3 14',
+} as const;
+
+export type IconName = keyof typeof paths;
+
+interface Props {
+  name: IconName;
+  size?: number;
+}
+
+const { name, size = 16 } = Astro.props;
+---
+
+<svg
+  class="icon"
+  viewBox="0 0 24 24"
+  width={size}
+  height={size}
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.8"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d={paths[name]}></path>
+</svg>
+
+<style>
+  .icon {
+    flex: none;
+  }
+</style>

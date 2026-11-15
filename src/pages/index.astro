@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Icon, { type IconName } from '../components/Icon.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import Terminal from '../components/Terminal.astro';
 import WriteupList from '../components/WriteupList.astro';
@@ -17,7 +18,17 @@ const contactLinks = [...links.contact, ...links.social];
   <section class="container hero" aria-labelledby="hero-title">
     <p class="hero__id">
       <span class="hero__name">{site.name}</span>
-      <span class="label">{site.role}</span>
+      <span class="label hero__disciplines">
+        {
+          site.disciplines.map((item, i) => (
+            <>
+              {i > 0 && <span aria-hidden="true"> · </span>}
+              <span class="hero__discipline">{item}</span>
+              {i < site.disciplines.length - 1 && <span class="visually-hidden">, </span>}
+            </>
+          ))
+        }
+      </span>
     </p>
     <h1 id="hero-title">{site.headline}</h1>
     <p class="lead">{site.intro}</p>
@@ -25,6 +36,16 @@ const contactLinks = [...links.contact, ...links.social];
       <a class="btn btn--primary" href="/writeups">View write-ups</a>
       <a class="btn" href="#contact">Contact</a>
     </p>
+    <ul class="hero__chips" aria-label="What I work on">
+      {
+        site.credentials.map((item) => (
+          <li class="chip">
+            <Icon name={item.icon as IconName} />
+            {item.label}
+          </li>
+        ))
+      }
+    </ul>
   </section>
 
   <div class="container hero__terminal">
@@ -138,6 +159,39 @@ const contactLinks = [...links.contact, ...links.social];
     flex-wrap: wrap;
     gap: var(--s-2);
     margin-block-start: var(--s-4);
+  }
+
+  .hero__discipline {
+    white-space: nowrap;
+  }
+
+  /* Credential chips: plain statements of what I work on, no numbers. */
+
+  .hero__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    margin-block-start: var(--s-3);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2rem;
+    padding-inline: 0.625rem 0.75rem;
+    border: var(--hairline) solid var(--border);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--surface) 70%, transparent);
+    color: var(--text);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .chip :global(.icon) {
+    color: var(--muted);
   }
 
   .hero__terminal {
