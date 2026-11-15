@@ -85,7 +85,9 @@ const earlier = projects.filter((p) => p.data.kind === 'development' && !p.data.
     content: '\2193'; /* down arrow */
   }
 
-  .jump a:hover::after {
-    transform: translateY(3px);
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+    .jump a:hover::after {
+      transform: translateY(3px);
+    }
   }
 </style>

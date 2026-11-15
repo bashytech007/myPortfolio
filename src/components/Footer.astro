@@ -58,8 +58,10 @@ const year = new Date().getFullYear();
     content: '\2191'; /* up arrow */
   }
 
-  .site-footer__up:hover::after {
-    transform: translateY(-3px);
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+    .site-footer__up:hover::after {
+      transform: translateY(-3px);
+    }
   }
 
   .site-footer__meta {
@@ -86,8 +88,10 @@ const year = new Date().getFullYear();
     transition: color var(--dur) var(--ease);
   }
 
-  .site-footer__links a:hover {
-    color: var(--text);
+  @media (hover: hover) and (pointer: fine) {
+    .site-footer__links a:hover {
+      color: var(--text);
+    }
   }
 
   @media (min-width: 48rem) {

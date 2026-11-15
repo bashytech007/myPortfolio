@@ -616,8 +616,10 @@ const number = {
     transition: color 200ms var(--ease);
   }
 
-  .focus li:hover .focus__num {
-    color: var(--accent);
+  @media (hover: hover) and (pointer: fine) {
+    .focus li:hover .focus__num {
+      color: var(--accent);
+    }
   }
 
   .focus h3 {
@@ -665,18 +667,22 @@ const number = {
       transform 200ms var(--ease);
   }
 
-  .contact a:hover,
-  .contact a:hover .label,
-  .contact a:hover .contact__arrow {
-    color: var(--accent);
+  @media (hover: hover) and (pointer: fine) {
+    .contact a:hover,
+    .contact a:hover .label,
+    .contact a:hover .contact__arrow {
+      color: var(--accent);
+    }
+
+    .contact li:has(a:hover) {
+      border-block-end-color: var(--accent);
+    }
   }
 
-  .contact a:hover .contact__arrow {
-    transform: translate(2px, -2px);
-  }
-
-  .contact li:has(a:hover) {
-    border-block-end-color: var(--accent);
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+    .contact a:hover .contact__arrow {
+      transform: translate(2px, -2px);
+    }
   }
 
   @media (min-width: 60rem) {

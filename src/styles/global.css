@@ -262,9 +262,11 @@ a {
     text-decoration-color var(--dur) var(--ease);
 }
 
-a:hover {
-  color: var(--accent-hover);
-  text-decoration-color: currentColor;
+@media (hover: hover) and (pointer: fine) {
+  a:hover {
+    color: var(--accent-hover);
+    text-decoration-color: currentColor;
+  }
 }
 
 button,
@@ -472,9 +474,11 @@ samp {
     transform 200ms var(--ease);
 }
 
-.btn:hover {
-  border-color: var(--text);
-  color: var(--text);
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    border-color: var(--text);
+    color: var(--text);
+  }
 }
 
 /* Focus ring: the accent outline plus a soft halo. */
@@ -485,13 +489,9 @@ samp {
   box-shadow: 0 0 0 7px var(--accent-wash);
 }
 
-@media (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
   .btn:hover {
     transform: translateY(-2px);
-  }
-
-  .btn:active {
-    transform: none;
   }
 }
 
@@ -502,10 +502,12 @@ samp {
   color: var(--bg);
 }
 
-.btn--primary:hover {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--on-accent);
+@media (hover: hover) and (pointer: fine) {
+  .btn--primary:hover {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--on-accent);
+  }
 }
 
 /* The ">_" in front of a link to the terminal. */
@@ -570,12 +572,14 @@ samp {
   content: '\2197'; /* up-right arrow */
 }
 
-.arrow-link:hover::after {
-  transform: translateX(3px);
-}
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  .arrow-link:hover::after {
+    transform: translateX(3px);
+  }
 
-.arrow-link[data-external]:hover::after {
-  transform: translate(2px, -2px);
+  .arrow-link[data-external]:hover::after {
+    transform: translate(2px, -2px);
+  }
 }
 
 .label.arrow-link {
@@ -583,8 +587,10 @@ samp {
   color: var(--muted);
 }
 
-.label.arrow-link:hover {
-  color: var(--text);
+@media (hover: hover) and (pointer: fine) {
+  .label.arrow-link:hover {
+    color: var(--text);
+  }
 }
 
 .card {

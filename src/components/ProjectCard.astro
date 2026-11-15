@@ -117,11 +117,13 @@ const Heading = `h${level}` as 'h2' | 'h3';
     transition: transform 700ms var(--ease-out);
   }
 
-  .project:hover .project__media {
-    border-color: var(--border-strong);
+  @media (hover: hover) and (pointer: fine) {
+    .project:hover .project__media {
+      border-color: var(--border-strong);
+    }
   }
 
-  @media (prefers-reduced-motion: no-preference) {
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
     .project:hover .project__media :global(img) {
       transform: scale(1.03);
     }
@@ -156,8 +158,10 @@ const Heading = `h${level}` as 'h2' | 'h3';
     transition: color 300ms var(--ease);
   }
 
-  .project:hover .project__num {
-    color: var(--accent);
+  @media (hover: hover) and (pointer: fine) {
+    .project:hover .project__num {
+      color: var(--accent);
+    }
   }
 
   .project__meta .label {

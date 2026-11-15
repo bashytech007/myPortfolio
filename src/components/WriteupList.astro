@@ -68,8 +68,10 @@ const Heading = `h${level}` as 'h2' | 'h3';
     inset: 0;
   }
 
-  .writeup:hover .writeup__title a {
-    color: var(--accent);
+  @media (hover: hover) and (pointer: fine) {
+    .writeup:hover .writeup__title a {
+      color: var(--accent);
+    }
   }
 
   .writeup__title a:focus-visible {

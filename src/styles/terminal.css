@@ -74,9 +74,11 @@ html:has(.term-page) {
   text-decoration-color: var(--ph-dim);
 }
 
-.term-page a:hover {
-  color: var(--ph-bright);
-  text-decoration-color: currentColor;
+@media (hover: hover) and (pointer: fine) {
+  .term-page a:hover {
+    color: var(--ph-bright);
+    text-decoration-color: currentColor;
+  }
 }
 
 /* Frame --------------------------------------------------------------------- */
@@ -114,8 +116,10 @@ html:has(.term-page) {
   white-space: nowrap;
 }
 
-.term-page .tty__back:hover {
-  color: var(--ph-bright);
+@media (hover: hover) and (pointer: fine) {
+  .term-page .tty__back:hover {
+    color: var(--ph-bright);
+  }
 }
 
 /* The window title only shows where there is room beside the back link. */
@@ -140,8 +144,10 @@ html:has(.term-page) {
   text-underline-offset: 0.2em;
 }
 
-.tty__skip:hover {
-  color: var(--ph-bright);
+@media (hover: hover) and (pointer: fine) {
+  .tty__skip:hover {
+    color: var(--ph-bright);
+  }
 }
 
 /* The screen's bezel: a hairline in the phosphor colour, a soft glow outside
@@ -538,10 +544,16 @@ html:not(.js) .tty__prompt {
     background-color var(--dur) var(--ease);
 }
 
-.term-chip:hover,
 .term-chip:focus-visible {
   border-color: var(--ph);
   color: var(--ph-bright);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .term-chip:hover {
+    border-color: var(--ph);
+    color: var(--ph-bright);
+  }
 }
 
 .term-chip:active {

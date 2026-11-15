@@ -149,8 +149,10 @@ if (!matches) {
     text-decoration-color: transparent;
   }
 
-  .writeup__toc a:hover {
-    color: var(--text);
+  @media (hover: hover) and (pointer: fine) {
+    .writeup__toc a:hover {
+      color: var(--text);
+    }
   }
 
   /* The first section follows the header directly. */

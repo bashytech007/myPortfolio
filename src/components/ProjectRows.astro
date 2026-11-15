@@ -61,8 +61,10 @@ const { projects } = Astro.props;
     transition: color 200ms var(--ease);
   }
 
-  .build:hover .build__num {
-    color: var(--accent);
+  @media (hover: hover) and (pointer: fine) {
+    .build:hover .build__num {
+      color: var(--accent);
+    }
   }
 
   .build__title {

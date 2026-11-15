@@ -113,8 +113,10 @@ const isCurrent = (href: string) =>
     text-decoration: none;
   }
 
-  .brand:hover {
-    color: var(--text);
+  @media (hover: hover) and (pointer: fine) {
+    .brand:hover {
+      color: var(--text);
+    }
   }
 
   .brand__chevron {
@@ -222,8 +224,10 @@ const isCurrent = (href: string) =>
     transition: color var(--dur) var(--ease);
   }
 
-  .theme-toggle:hover {
-    color: var(--text);
+  @media (hover: hover) and (pointer: fine) {
+    .theme-toggle:hover {
+      color: var(--text);
+    }
   }
 
   .theme-toggle:focus-visible,
@@ -297,9 +301,14 @@ const isCurrent = (href: string) =>
       transition: color 200ms var(--ease);
     }
 
-    .site-nav a:hover,
     .site-nav a[aria-current] {
       color: var(--text);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .site-nav a:hover {
+        color: var(--text);
+      }
     }
 
     .site-nav li:not(.site-nav__terminal) a::after {
@@ -314,9 +323,14 @@ const isCurrent = (href: string) =>
       transition: transform 300ms var(--ease-out);
     }
 
-    .site-nav li:not(.site-nav__terminal) a:hover::after,
     .site-nav li:not(.site-nav__terminal) a[aria-current]::after {
       transform: scaleX(1);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .site-nav li:not(.site-nav__terminal) a:hover::after {
+        transform: scaleX(1);
+      }
     }
 
     .site-nav a[aria-current]::after {
@@ -335,9 +349,11 @@ const isCurrent = (href: string) =>
         background-color 200ms var(--ease);
     }
 
-    .site-nav .term-link:hover {
-      border-color: var(--accent);
-      background: var(--accent-wash);
+    @media (hover: hover) and (pointer: fine) {
+      .site-nav .term-link:hover {
+        border-color: var(--accent);
+        background: var(--accent-wash);
+      }
     }
 
     .term-link__glyph {
