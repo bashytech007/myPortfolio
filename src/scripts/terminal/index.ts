@@ -37,7 +37,6 @@ export function initTerminal(): void {
   const history = loadHistory();
   let historyIndex = history.length;
   let draft = '';
-  let output: HTMLElement | null = null;
 
   const files = [...root.querySelectorAll<HTMLTemplateElement>('template[data-file]')].map(
     (template) => template.dataset.file ?? '',
@@ -53,25 +52,17 @@ export function initTerminal(): void {
     links: readJson<Shell['links']>(root.dataset.links, {}),
     history,
 
-    // Typed input only ever reaches the page through textContent.
-    print(text, className) {
-      const line = document.createElement('p');
-      if (className) line.className = className;
-      line.textContent = text;
-      output?.append(line);
-    },
+    // Each run prints into its own entry (see `scoped` below), so these two
+    // do nothing until a command is running.
+    print() {},
 
-    printTemplate(selector) {
-      const template = root.querySelector<HTMLTemplateElement>(selector);
-      if (!template) return false;
-      output?.append(template.content.cloneNode(true));
-      return true;
+    printTemplate() {
+      return false;
     },
 
     clear() {
       session.hidden = true;
       log.replaceChildren();
-      output = null;
     },
 
     navigate(href) {
@@ -140,7 +131,30 @@ export function initTerminal(): void {
     out.className = 'term-out';
     entry.append(echo, out);
     log.append(entry);
-    output = out;
+
+    // A command prints into the entry it was typed in, even when another
+    // command finishes first.
+    let target: HTMLElement | null = out;
+    const scoped: Shell = {
+      ...shell,
+      print(message, className) {
+        const line = document.createElement('p');
+        if (className) line.className = className;
+        // Typed input only ever reaches the page through textContent.
+        line.textContent = message;
+        target?.append(line);
+      },
+      printTemplate(selector) {
+        const template = root.querySelector<HTMLTemplateElement>(selector);
+        if (!template) return false;
+        target?.append(template.content.cloneNode(true));
+        return true;
+      },
+      clear() {
+        shell.clear();
+        target = null;
+      },
+    };
 
     if (text) {
       if (history.at(-1) !== text) history.push(text);
@@ -155,12 +169,12 @@ export function initTerminal(): void {
       const command = Object.hasOwn(commands, name.toLowerCase()) ? commands[name.toLowerCase()] : undefined;
       if (command) {
         try {
-          await command.run(args, shell);
+          await command.run(args, scoped);
         } catch {
-          shell.print(`${name}: something went wrong`, 'term-error');
+          scoped.print(`${name}: something went wrong`, 'term-error');
         }
       } else {
-        shell.print(`command not found: ${name}. Type help for a list.`, 'term-error');
+        scoped.print(`command not found: ${name}. Type help for a list.`, 'term-error');
       }
     }
 
