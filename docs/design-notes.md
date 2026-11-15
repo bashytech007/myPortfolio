@@ -35,11 +35,15 @@ pill button in the text colour.
 
 **Hover.** Small and consistent. Navigation links grow an underline from one
 side. Text links are already in the accent. Rows in the link list change colour
-as a whole. Screenshots scale up slightly inside their frame.
+as a whole. Screenshots scale up 2% inside their frame. Hover effects only
+exist for a mouse; a tap gets a press state instead.
 
-**Motion.** A handful of effects, each used once: the wordmark rises into place
-on load, a thin line pulses under a scroll hint, a strip of words drifts
-sideways, and sections fade up as they arrive.
+**Motion.** Short and composited. The wordmark and buttons arrive in one
+entrance of about 620ms, sections fade in once over 240ms with a rise of 8px
+at most, buttons dip slightly when pressed, and a slow strip of words drifts
+sideways (pausable). The only other loops are the two block cursors. Everything
+is removed or reduced to a simple fade under reduced motion. The rules are in
+`DESIGN.md`.
 
 **Rhythm.** Every section starts the same way: rule, small numbered label
 ("01 / ..."), then a large statement. Projects repeat one unit: big numeral,
@@ -77,6 +81,6 @@ buttons become the main way in.
 | Hairlines, not boxes | `.section-head` rule and label, `.rows` lists, 12px radius on screenshots only. |
 | Numbered sections | `SectionHead.astro` numbers each home section in order. |
 | One repeated project unit | `ProjectCard.astro`: screenshot, numeral and label, title, summary, tools, links. Laid out as a two-column grid with the second column dropped. |
-| Small hover states | Underline sweep in the nav, screenshot scale in its frame, whole-row colour in lists, arrow nudge on links. |
-| A few motions, once each | Hero lines rise on load, a strip of work areas drifts under the hero, sections fade up. All off under reduced motion. |
+| Small hover states, for a mouse only | Underline sweep in the nav, screenshot scale in its frame, whole-row colour in lists, arrow nudge on links, a 2px lift on buttons. A press state confirms every tap. |
+| Few, short motions | One hero entrance, a 240ms fade for each section, a slow pausable strip of work areas, two blinking cursors. All off or reduced to a fade under reduced motion. |
 | Terminal as its own place | `/terminal`, full screen, reached from the nav. Boot lines report real facts about this site. Amber, green and mono phosphor themes. Grouped help, aligned project table, inline suggestion, shortcut bar. |
