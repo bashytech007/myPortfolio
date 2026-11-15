@@ -1,37 +1,20 @@
 ---
-import '../styles/terminal.css';
 import Base from '../layouts/Base.astro';
-import { nav, site } from '../lib/site';
+import { nav, terminal } from '../lib/site';
 ---
 
 <Base title="Page not found" description="There is no page at this address." noindex>
   <div class="container notfound">
-    <p class="label label--accent">404</p>
+    <p class="label"><span class="label--accent">404</span> / Not found</p>
     <h1>Command not found</h1>
     <p class="lead">There is no page at this address. It may have moved, or the link may be wrong.</p>
 
-    <div class="terminal notfound__terminal" role="img" aria-label="A terminal showing: command not found">
-      <div class="terminal__bar" aria-hidden="true">
-        <span class="terminal__dots"><i></i><i></i><i></i></span>
-        <p class="terminal__title">visitor@{site.handle}: ~</p>
-        <span></span>
-      </div>
-      <div class="terminal__screen notfound__screen" aria-hidden="true">
-        <div class="term-entry">
-          <p class="term-line">
-            <span class="term-prompt">$</span>
-            <span class="term-cmd" data-not-found-path>cd /this-page</span>
-          </p>
-          <div class="term-out">
-            <p>command not found</p>
-          </div>
-        </div>
-        <p class="term-line">
-          <span class="term-prompt">$</span>
-          <span class="term-cmd">cd ~</span>
-          <span class="term-cursor"></span>
-        </p>
-      </div>
+    <div class="notfound__session" role="img" aria-label="A terminal showing: no such page">
+      <p aria-hidden="true">
+        <span class="notfound__prompt">$</span>
+        <span data-not-found-path>cd /this-page</span>
+      </p>
+      <p class="notfound__out" aria-hidden="true">no such page</p>
     </div>
 
     <p class="notfound__actions">
@@ -45,6 +28,10 @@ import { nav, site } from '../lib/site';
             </a>
           ))
       }
+      <a class="btn" href={terminal.href}>
+        <span class="btn__glyph" aria-hidden="true">&gt;_</span>
+        {terminal.label}
+      </a>
     </p>
   </div>
 </Base>
@@ -69,33 +56,47 @@ import { nav, site } from '../lib/site';
   }
 
   .notfound h1 {
-    margin-block-start: var(--s-2);
-    font-size: clamp(2.25rem, 1.6rem + 3vw, 3.5rem);
+    margin-block-start: var(--s-3);
+    font-size: clamp(2.5rem, 1.5rem + 4.4vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
   }
 
   .notfound .lead {
-    margin-block-start: var(--s-3);
+    margin-block-start: var(--s-4);
   }
 
-  .notfound__terminal {
+  /* Two lines of a shell session between hairlines. */
+  .notfound__session {
     max-width: 40rem;
-    margin-block-start: var(--s-5);
+    margin-block-start: var(--s-6);
+    padding-block: var(--s-3);
+    border-block: var(--hairline) solid var(--border);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-wrap: anywhere;
   }
 
-  .notfound__screen {
-    padding-block-end: var(--term-pad);
+  .notfound__prompt {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .notfound__out {
+    color: var(--muted);
   }
 
   .notfound__actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-2);
-    margin-block-start: var(--s-5);
+    margin-block-start: var(--s-6);
   }
 
   @media (min-width: 48rem) {
     .notfound {
-      padding-block-start: var(--s-12);
+      padding-block-start: var(--s-14);
     }
   }
 </style>
