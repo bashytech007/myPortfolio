@@ -7,9 +7,14 @@ export function getTheme(): Theme {
 }
 
 function apply(theme: Theme): void {
+  // Switch everything in one frame: transitions are off while the new colours
+  // are computed, so links, buttons and borders do not trail the background.
+  root.dataset.themeSwitching = '';
   if (theme === 'light') root.dataset.theme = 'light';
   else delete root.dataset.theme;
   syncControls();
+  void getComputedStyle(root).color;
+  delete root.dataset.themeSwitching;
 }
 
 /** Switch theme and remember the choice for the next visit. */
@@ -37,7 +42,8 @@ function syncControls(): void {
   }
 
   const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-  if (meta) meta.content = getComputedStyle(root).getPropertyValue('--bg').trim();
+  // Use the page's own background, so /terminal keeps its dark browser chrome.
+  if (meta) meta.content = getComputedStyle(document.body).backgroundColor;
 }
 
 export function initThemeControls(): void {
