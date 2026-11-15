@@ -4,7 +4,7 @@ summary: "A static portfolio that sends a strict Content-Security-Policy, runs n
 kind: security
 tags: [Astro, TypeScript, CSP]
 image: ./images/this-site.png
-imageAlt: "Home page of this site, with the headline above a terminal window."
+imageAlt: "Home page of this site: the name set large, with the headline and two buttons under it."
 live: "/security"
 liveLabel: "How it is hardened"
 featured: true
