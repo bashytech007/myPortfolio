@@ -1,7 +1,8 @@
 {
   "name": "Bashir Aremu",
   "handle": "bashir",
-  "role": "Application security engineer",
+  "role": "Application Security & DevSecOps Engineer",
+  "roles": ["Application Security & DevSecOps Engineer", "Full-Stack Software Engineer"],
   "disciplines": ["Application Security", "DevSecOps", "Full-Stack"],
   "employer": "TraceWorka Innovative Solutions",
   "location": "Lagos, Nigeria",
@@ -13,8 +14,8 @@
     { "icon": "shield", "label": "CI/CD security gates" },
     { "icon": "code", "label": "React · Node · TypeScript" }
   ],
-  "description": "Bashir Aremu is an application security engineer working on web and API penetration testing, AI red teaming and bug bounty recon.",
-  "whoami": "Bashir Aremu, application security engineer.",
+  "description": "Bashir Aremu is an application security and DevSecOps engineer and a full-stack software engineer, working on web and API penetration testing, AI red teaming and bug bounty recon.",
+  "whoami": "Bashir Aremu. Application security and DevSecOps engineer, and full-stack software engineer.",
   "about": [
     "I test web applications and APIs for security flaws at TraceWorka Innovative Solutions, where I've worked since March 2025.",
     "Before that I was a full-stack developer, so I know how these systems get built and where the shortcuts usually are.",

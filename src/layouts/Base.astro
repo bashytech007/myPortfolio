@@ -39,7 +39,7 @@ const ogImage = new URL('/og.png', Astro.site).href;
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content="#0e1013" />
+    <meta name="theme-color" content="#0b0c0e" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preload" href={interUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={monoUrl} as="font" type="font/woff2" crossorigin />
@@ -47,13 +47,13 @@ const ogImage = new URL('/og.png', Astro.site).href;
 
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={site.name} />
-    <meta property="og:title" content={title ?? `${site.name}, ${site.role.toLowerCase()}`} />
+    <meta property="og:title" content={title ?? `${site.name}, ${site.role}`} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={`${site.name}, ${site.role.toLowerCase()}`} />
+    <meta property="og:image:alt" content={`${site.name}, ${site.role}`} />
     <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body class={bodyClass}>
