@@ -49,8 +49,7 @@ const number = {
           restOfName.length > 0 && (
             <span class="hero__line">
               <span class="hero__word">
-                {restOfName.join(' ')}
-                <span class="hero__cursor" aria-hidden="true" />
+                {restOfName.join(' ')}<span class="hero__cursor" aria-hidden="true" />
               </span>
             </span>
           )
@@ -242,11 +241,18 @@ const number = {
   .hero-band::after {
     content: '';
     position: absolute;
-    inset: -30% -20% auto 35%;
+    inset: -10% -70% auto -10%;
     z-index: -1;
-    height: 120%;
+    height: 100%;
     background: radial-gradient(closest-side, var(--glow), transparent);
     pointer-events: none;
+  }
+
+  @media (min-width: 60rem) {
+    .hero-band::after {
+      inset: -30% -20% auto 35%;
+      height: 120%;
+    }
   }
 
   .hero {
@@ -293,9 +299,9 @@ const number = {
   /* A block cursor after the name, the same idea as the mark in the header. */
   .hero__cursor {
     display: inline-block;
-    width: 0.4em;
-    height: 0.72em;
-    margin-inline-start: 0.1em;
+    width: 0.26em;
+    height: 0.725em;
+    margin-inline-start: 0.11em;
     background: var(--accent);
   }
 

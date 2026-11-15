@@ -76,8 +76,9 @@
   --text-xl: 1.5rem;
   --text-2xl: clamp(1.625rem, 1.3rem + 1.5vw, 2.25rem);
   --text-3xl: clamp(2.125rem, 1.35rem + 3.6vw, 3.5rem);
-  /* The name in the hero: sized to the viewport, capped on wide screens. */
-  --text-display: clamp(4.25rem, 21vw, 13rem);
+  /* The name in the hero: sized to the viewport's width, held back by its
+     height so the hero still fits one screen, and capped on wide screens. */
+  --text-display: clamp(4.25rem, min(22.5vw, 25svh), 14rem);
 
   --track-label: 0.16em;
   --track-tight: -0.03em;
