@@ -384,12 +384,14 @@ const number = {
      300ms  facts               fade in                    320ms
 
      The name is never transparent, because it is the largest paint on the
-     page. `backwards` holds each start state only until its turn; once an
-     animation ends the element is back on its own styles, so the buttons'
-     hover and press states are untouched. */
+     page. `both` holds each start state until its turn and the end state
+     afterwards. With `backwards` the statement was repainted when its
+     animation ended and counted as a later, larger paint. The end keyframe is
+     implicit, so it follows the element's own styles. The animated elements
+     are wrappers, so the buttons' hover and press states are untouched. */
   @media (prefers-reduced-motion: no-preference) {
     .hero__word {
-      animation: hero-rise 520ms var(--ease-out) backwards;
+      animation: hero-rise 520ms var(--ease-out) both;
     }
 
     .hero__line + .hero__line .hero__word {
@@ -398,15 +400,15 @@ const number = {
 
     .hero__roles,
     .hero__statement {
-      animation: hero-arrive 320ms var(--ease-out) 180ms backwards;
+      animation: hero-arrive 320ms var(--ease-out) 180ms both;
     }
 
     .hero__actions {
-      animation: hero-arrive 320ms var(--ease-out) 240ms backwards;
+      animation: hero-arrive 320ms var(--ease-out) 240ms both;
     }
 
     .hero__facts {
-      animation: hero-fade 320ms var(--ease-out) 300ms backwards;
+      animation: hero-fade 320ms var(--ease-out) 300ms both;
     }
 
     /* The cursor starts blinking a beat after everything has landed. */
@@ -421,7 +423,7 @@ const number = {
   @media (prefers-reduced-motion: reduce) {
     .hero__roles,
     .hero__foot {
-      animation: hero-fade var(--dur-move) var(--ease) backwards;
+      animation: hero-fade var(--dur-move) var(--ease) both;
       animation-duration: var(--dur-move) !important;
     }
   }
