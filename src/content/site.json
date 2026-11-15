@@ -4,8 +4,16 @@
   "role": "Application Security & DevSecOps Engineer",
   "roles": ["Application Security & DevSecOps Engineer", "Full-Stack Software Engineer"],
   "disciplines": ["Application Security", "DevSecOps", "Full-Stack"],
-  "employer": "TraceWorka Innovative Solutions",
   "location": "Lagos, Nigeria",
+  "experienceIntro": "Where I work.",
+  "experience": [
+    { "role": "AI Red Team Specialist", "org": "BLEND", "start": "2026-11" },
+    {
+      "role": "Application Security Engineer",
+      "org": "TraceWorka Innovative Solutions",
+      "start": "2025-03"
+    }
+  ],
   "headline": "I test web apps, APIs and AI agents the way an attacker would.",
   "intro": "I build web systems, secure them, and automate that security into the pipeline.",
   "credentials": [

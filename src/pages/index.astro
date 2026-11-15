@@ -4,7 +4,7 @@ import ProjectCard from '../components/ProjectCard.astro';
 import SectionHead from '../components/SectionHead.astro';
 import WriteupList from '../components/WriteupList.astro';
 import { getProjects, getWriteups } from '../lib/content';
-import { links, site, terminal } from '../lib/site';
+import { currentJobs, experience, formatMonth, links, site, terminal } from '../lib/site';
 
 const projects = await getProjects();
 const writeups = await getWriteups();
@@ -22,6 +22,7 @@ const next = () => (count += 1);
 const number = {
   work: next(),
   about: next(),
+  experience: next(),
   focus: next(),
   writeups: latestWriteups.length > 0 ? next() : 0,
   contact: next(),
@@ -70,7 +71,7 @@ const number = {
         <dl class="hero__facts">
           <div>
             <dt class="label">Currently</dt>
-            <dd>{site.employer}</dd>
+            {currentJobs.map((job) => <dd>{job.org}</dd>)}
           </div>
           <div>
             <dt class="label">Based in</dt>
@@ -137,8 +138,8 @@ const number = {
             ))
           }
           <div>
-            <dt class="label">Employer</dt>
-            <dd>{site.employer}</dd>
+            <dt class="label">Currently</dt>
+            {currentJobs.map((job) => <dd>{job.org}</dd>)}
           </div>
           <div>
             <dt class="label">Location</dt>
@@ -149,6 +150,37 @@ const number = {
           {site.about.map((paragraph) => <p>{paragraph}</p>)}
         </div>
       </div>
+    </div>
+  </section>
+
+  <section id="experience" class="band" aria-labelledby="experience-title">
+    <div class="container" data-reveal>
+      <SectionHead
+        id="experience-title"
+        number={number.experience}
+        label="Experience"
+        title={site.experienceIntro}
+      />
+      <ol class="rows experience">
+        {
+          experience.map((job) => (
+            <li>
+              <p class="label experience__dates">
+                <time datetime={job.start}>{formatMonth(job.start)}</time>
+                <span aria-hidden="true"> &ndash; </span>
+                <span class="visually-hidden"> to </span>
+                {job.end ? (
+                  <time datetime={job.end}>{formatMonth(job.end)}</time>
+                ) : (
+                  <span class="label--accent">Present</span>
+                )}
+              </p>
+              <h3>{job.role}</h3>
+              <p class="experience__org">{job.org}</p>
+            </li>
+          ))
+        }
+      </ol>
     </div>
   </section>
 
@@ -542,6 +574,23 @@ const number = {
     color: var(--text);
   }
 
+  /* Experience: one row per role, newest first. Dates, role, organisation. */
+
+  .experience li {
+    display: grid;
+    gap: 0.375rem;
+    padding-block: var(--s-4);
+  }
+
+  .experience h3 {
+    font-size: var(--text-xl);
+    letter-spacing: -0.025em;
+  }
+
+  .experience__org {
+    color: var(--muted);
+  }
+
   /* Focus: a numbered list with large numerals. */
 
   .focus li {
@@ -635,6 +684,7 @@ const number = {
       gap: var(--s-3);
     }
 
+    .experience li,
     .focus li {
       grid-template-columns: minmax(0, 2fr) minmax(0, 4fr) minmax(0, 6fr);
       align-items: baseline;
