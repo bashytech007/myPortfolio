@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField } from 'astro/config';
 import vercel from '@astrojs/vercel';
 
 // The canonical URL of the deployed site. Set SITE_URL in the Vercel project
@@ -17,9 +17,15 @@ export default defineConfig({
   trailingSlash: 'never',
   compressHTML: true,
   devToolbar: { enabled: false },
+  env: {
+    schema: {
+      // SHOW_DRAFTS=true includes draft write-ups and projects in a build.
+      SHOW_DRAFTS: envField.boolean({ context: 'server', access: 'public', default: false }),
+    },
+  },
   build: {
     // The Content-Security-Policy allows no inline styles or scripts, so
-    // everything is emitted as a file.
+    // every stylesheet and script is emitted as a file.
     inlineStylesheets: 'never',
   },
   vite: {

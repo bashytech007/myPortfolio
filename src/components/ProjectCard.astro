@@ -1,0 +1,134 @@
+---
+import { Image } from 'astro:assets';
+import { isExternal, type Project } from '../lib/content';
+
+interface Props {
+  project: Project;
+  /** Heading level for the title, so the card fits the page outline. */
+  level?: 2 | 3;
+  /** `sizes` attribute for the screenshot. */
+  sizes?: string;
+}
+
+const {
+  project,
+  level = 3,
+  sizes = '(min-width: 73rem) 352px, (min-width: 60rem) 31vw, (min-width: 40rem) 290px, calc(100vw - 2.5rem)',
+} = Astro.props;
+const { title, summary, kind, tags, image, imageAlt, live, liveLabel, source, draft } = project.data;
+const Heading = `h${level}` as 'h2' | 'h3';
+---
+
+<article class:list={['card', 'project', { 'project--plain': !image }]}>
+  {
+    image && (
+      <div class="project__media">
+        <Image src={image} alt={imageAlt ?? ''} widths={[360, 540, 720, 1080]} sizes={sizes} />
+      </div>
+    )
+  }
+  <div class="project__body">
+    <p class="project__meta">
+      <span class:list={['label', { 'label--accent': kind === 'security' }]}>{kind}</span>
+      {draft && <span class="tag tag--draft">Draft</span>}
+    </p>
+    <Heading class="project__title">{title}</Heading>
+    <p class="project__summary">{summary}</p>
+    {
+      tags.length > 0 && (
+        <ul class="tags" aria-label="Built with">
+          {tags.map((tag) => (
+            <li class="tag">{tag}</li>
+          ))}
+        </ul>
+      )
+    }
+    {
+      (live || source) && (
+        <p class="project__links">
+          {live && (
+            <a class="text-link" href={live} rel={isExternal(live) ? 'noopener noreferrer' : undefined}>
+              {liveLabel}
+              <span class="visually-hidden">: {title}</span>
+            </a>
+          )}
+          {source && (
+            <a class="text-link" href={source} rel="noopener noreferrer">
+              Source
+              <span class="visually-hidden">: {title}</span>
+            </a>
+          )}
+        </p>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .project {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .project__media {
+    aspect-ratio: 16 / 10;
+    border-block-end: var(--hairline) solid var(--border);
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+
+  .project__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  .project__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--s-2);
+    padding: var(--s-3);
+  }
+
+  .project__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-1);
+    min-height: 1.625rem;
+    margin-block-end: calc(var(--s-1) * -1);
+  }
+
+  .project__summary {
+    color: var(--muted);
+    font-size: var(--text-md);
+    line-height: 1.55;
+  }
+
+  .project__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-3);
+    margin-block-start: auto;
+    padding-block-start: var(--s-1);
+  }
+
+  /* Between phone and desktop widths a card lies on its side, so three
+     cards never leave an orphan in a two-column grid. */
+  @media (min-width: 40rem) and (max-width: 59.99rem) {
+    .project:not(.project--plain) {
+      flex-direction: row;
+    }
+
+    .project__media {
+      flex: 0 0 42%;
+      aspect-ratio: auto;
+      min-height: 13rem;
+      border-block-end: 0;
+      border-inline-end: var(--hairline) solid var(--border);
+    }
+  }
+</style>

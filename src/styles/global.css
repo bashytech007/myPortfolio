@@ -288,16 +288,15 @@ samp {
 }
 
 .section-head {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
-  justify-content: space-between;
   gap: var(--s-1) var(--s-3);
   margin-block-end: var(--s-5);
 }
 
 .section-head p {
-  flex-basis: 100%;
+  grid-column: 1 / -1;
   max-width: var(--measure);
   color: var(--muted);
 }
@@ -458,6 +457,17 @@ samp {
   border: var(--hairline) solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
+}
+
+.project-grid {
+  display: grid;
+  gap: var(--s-3);
+}
+
+@media (min-width: 60rem) {
+  .project-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 /* Rows separated by hairlines: write-up lists, contact list, earlier builds. */
