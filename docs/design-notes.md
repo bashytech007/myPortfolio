@@ -42,8 +42,9 @@ state instead.
 **Motion.** Short and composited. On load the name rises into place and the
 roles, statement, buttons and facts follow in one entrance that is over in
 620ms. Sections fade in once over 240ms with a rise of 8px, buttons dip
-slightly when pressed, and a slow strip of words drifts sideways and pauses
-under a mouse pointer. The only other loops are the two block cursors. Under
+slightly when pressed, and a slow strip of words drifts sideways. It pauses
+under a mouse pointer, and a small button at its end pauses it for keyboard and
+touch users. The only other loops are the two block cursors. Under
 reduced motion nothing moves or loops: the hero text fades in and everything
 else is simply there. The rules and the exact values are in `DESIGN.md`.
 
@@ -84,5 +85,5 @@ buttons become the main way in.
 | Numbered sections | `SectionHead.astro` numbers each home section in order. |
 | One repeated project unit | `ProjectCard.astro`: screenshot, numeral and label, title, summary, tools, links. Laid out as a two-column grid with the second column dropped. |
 | Small hover states, for a mouse only | Underline sweep in the nav, screenshot scale in its frame, whole-row colour in lists, arrow nudge on links, a 2px lift on buttons. Buttons have a press state for taps. |
-| Few, short motions | One hero entrance (620ms), a 240ms fade for each section, a slow strip of work areas that pauses under a mouse pointer, two blinking cursors. All off or reduced to a fade under reduced motion. |
+| Few, short motions | One hero entrance (620ms), a 240ms fade for each section, a slow strip of work areas with a pause button, two blinking cursors. All off or reduced to a fade under reduced motion. |
 | Terminal as its own place | `/terminal`, full screen, reached from the nav. Boot lines report real facts about this site. Amber, green and mono phosphor themes. Grouped help, aligned project table, inline suggestion, shortcut bar. |
