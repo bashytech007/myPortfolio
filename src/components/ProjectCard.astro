@@ -106,7 +106,7 @@ const Heading = `h${level}` as 'h2' | 'h3';
     border-radius: var(--radius);
     background: var(--surface);
     overflow: hidden;
-    transition: border-color 300ms var(--ease);
+    transition: border-color var(--dur) var(--ease);
   }
 
   .project__media :global(img) {
@@ -114,7 +114,7 @@ const Heading = `h${level}` as 'h2' | 'h3';
     height: 100%;
     object-fit: cover;
     object-position: top left;
-    transition: transform 700ms var(--ease-out);
+    transition: transform var(--dur-move) var(--ease-out);
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -125,7 +125,7 @@ const Heading = `h${level}` as 'h2' | 'h3';
 
   @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
     .project:hover .project__media :global(img) {
-      transform: scale(1.03);
+      transform: scale(1.02);
     }
   }
 
@@ -155,7 +155,7 @@ const Heading = `h${level}` as 'h2' | 'h3';
     line-height: 1;
     letter-spacing: -0.04em;
     color: var(--muted);
-    transition: color 300ms var(--ease);
+    transition: color var(--dur) var(--ease);
   }
 
   @media (hover: hover) and (pointer: fine) {

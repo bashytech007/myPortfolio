@@ -70,7 +70,7 @@ const isCurrent = (href: string) =>
     z-index: 20;
     border-block-end: var(--hairline) solid transparent;
     background: var(--bg);
-    transition: border-color 200ms var(--ease);
+    transition: border-color var(--dur) var(--ease);
   }
 
   @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
@@ -308,7 +308,7 @@ const isCurrent = (href: string) =>
       font-weight: 500;
       letter-spacing: var(--track-label);
       text-transform: uppercase;
-      transition: color 200ms var(--ease);
+      transition: color var(--dur) var(--ease);
     }
 
     .site-nav a[aria-current] {
@@ -330,7 +330,7 @@ const isCurrent = (href: string) =>
       background: currentColor;
       transform: scaleX(0);
       transform-origin: left;
-      transition: transform 300ms var(--ease-out);
+      transition: transform var(--dur-move) var(--ease-out);
     }
 
     .site-nav li:not(.site-nav__terminal) a[aria-current]::after {

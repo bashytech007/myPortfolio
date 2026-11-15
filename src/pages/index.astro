@@ -613,7 +613,7 @@ const number = {
     line-height: 1;
     letter-spacing: -0.04em;
     color: var(--muted);
-    transition: color 200ms var(--ease);
+    transition: color var(--dur) var(--ease);
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -634,6 +634,10 @@ const number = {
 
   /* Contact: whole rows are links and change colour together. */
 
+  .contact li {
+    transition: border-color var(--dur) var(--ease);
+  }
+
   .contact a {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -642,12 +646,12 @@ const number = {
     padding-block: var(--s-3);
     color: var(--text);
     text-decoration: none;
-    transition: color 200ms var(--ease);
+    transition: color var(--dur) var(--ease);
   }
 
   .contact .label {
     grid-column: 1 / -1;
-    transition: color 200ms var(--ease);
+    transition: color var(--dur) var(--ease);
   }
 
   .contact__value {
@@ -663,8 +667,8 @@ const number = {
     font-size: var(--text-md);
     color: var(--muted);
     transition:
-      color 200ms var(--ease),
-      transform 200ms var(--ease);
+      color var(--dur) var(--ease),
+      transform var(--dur-move) var(--ease-out);
   }
 
   @media (hover: hover) and (pointer: fine) {
