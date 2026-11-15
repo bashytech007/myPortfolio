@@ -259,7 +259,8 @@ const number = {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    min-height: calc(100svh - var(--header-h));
+    /* One screen tall, but never stretched on a very tall window. */
+    min-height: min(calc(100svh - var(--header-h)), 56rem);
     padding-block: var(--s-8) var(--s-5);
   }
 
@@ -394,7 +395,6 @@ const number = {
 
   @media (min-width: 60rem) {
     .hero {
-      min-height: min(calc(100svh - var(--header-h)), 56rem);
       padding-block: var(--s-10) var(--s-6);
     }
 
