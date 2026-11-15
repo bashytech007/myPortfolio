@@ -159,6 +159,7 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-padding-top: calc(var(--header-h) + var(--s-2));
+  -webkit-tap-highlight-color: transparent;
   background: var(--bg);
 }
 
@@ -277,6 +278,12 @@ input {
 
 button {
   cursor: pointer;
+}
+
+/* No double-tap-to-zoom delay on anything tappable. */
+a,
+button {
+  touch-action: manipulation;
 }
 
 code,
@@ -471,7 +478,7 @@ samp {
     background-color var(--dur) var(--ease),
     border-color var(--dur) var(--ease),
     color var(--dur) var(--ease),
-    transform 200ms var(--ease);
+    transform var(--dur-press) var(--ease-out);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -489,9 +496,25 @@ samp {
   box-shadow: 0 0 0 7px var(--accent-wash);
 }
 
+/* A small lift for a mouse, and a press that confirms every tap or click. */
 @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  .btn {
+    transition:
+      background-color var(--dur) var(--ease),
+      border-color var(--dur) var(--ease),
+      color var(--dur) var(--ease),
+      transform var(--dur) var(--ease-out);
+  }
+
   .btn:hover {
     transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn:active {
+    transform: scale(0.97);
+    transition-duration: var(--dur), var(--dur), var(--dur), var(--dur-press);
   }
 }
 

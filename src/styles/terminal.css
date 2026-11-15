@@ -529,6 +529,7 @@ html:not(.js) .tty__prompt {
 }
 
 .term-chip {
+  touch-action: manipulation;
   min-height: 2.5rem;
   padding: 0 0.875rem;
   border: var(--hairline) solid var(--ph-edge);

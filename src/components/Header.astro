@@ -195,6 +195,7 @@ const isCurrent = (href: string) =>
     border-radius: var(--radius-sm);
     background: transparent;
     color: var(--text);
+    transition: transform var(--dur-press) var(--ease-out);
   }
 
   .menu-toggle__close,
@@ -221,7 +222,16 @@ const isCurrent = (href: string) =>
     border-radius: var(--radius-sm);
     background: transparent;
     color: var(--muted);
-    transition: color var(--dur) var(--ease);
+    transition:
+      color var(--dur) var(--ease),
+      transform var(--dur-press) var(--ease-out);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .theme-toggle:active,
+    .menu-toggle:active {
+      transform: scale(0.95);
+    }
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -345,8 +355,15 @@ const isCurrent = (href: string) =>
       border-radius: var(--radius-pill);
       color: var(--text);
       transition:
-        border-color 200ms var(--ease),
-        background-color 200ms var(--ease);
+        border-color var(--dur) var(--ease),
+        background-color var(--dur) var(--ease),
+        transform var(--dur-press) var(--ease-out);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .site-nav .term-link:active {
+        transform: scale(0.97);
+      }
     }
 
     @media (hover: hover) and (pointer: fine) {
