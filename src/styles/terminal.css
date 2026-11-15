@@ -533,9 +533,9 @@ html:not(.js) .tty__prompt {
   font-size: var(--text-xs);
   line-height: 1;
   transition:
-    border-color 160ms var(--ease),
-    color 160ms var(--ease),
-    background-color 160ms var(--ease);
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease);
 }
 
 .term-chip:hover,
