@@ -202,7 +202,7 @@
 
 .term-line .term-cursor {
   align-self: center;
-  margin-inline-start: -1ch;
+  margin-inline-start: -0.6ch;
 }
 
 @media (prefers-reduced-motion: no-preference) {

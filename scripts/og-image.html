@@ -1,0 +1,102 @@
+<!doctype html>
+<!--
+  Source for public/og.png (1200x630), the image shown when a link to the
+  site is shared. This file is not part of the built site.
+
+  To regenerate after changing the text, render it with any Chromium browser:
+
+    chrome --headless --hide-scrollbars --window-size=1200,630 \
+      --screenshot=public/og.png scripts/og-image.html
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Open Graph image</title>
+    <style>
+      @font-face {
+        font-family: 'Inter Variable';
+        font-weight: 100 900;
+        src: url('../src/assets/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+      }
+      @font-face {
+        font-family: 'JetBrains Mono Variable';
+        font-weight: 100 800;
+        src: url('../src/assets/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 72px 80px;
+        background: #0e1013;
+        color: #e9e7e2;
+        font-family: 'Inter Variable', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 30px;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+      }
+      .brand svg {
+        width: 36px;
+        height: 36px;
+      }
+      h1 {
+        max-width: 960px;
+        font-size: 76px;
+        font-weight: 600;
+        line-height: 1.04;
+        letter-spacing: -0.035em;
+        text-wrap: balance;
+      }
+      .foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 28px;
+        border-top: 1px solid #262b32;
+        color: #9ba3ae;
+        font-family: 'JetBrains Mono Variable', monospace;
+        font-size: 22px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .foot span:first-child {
+        letter-spacing: 0;
+        text-transform: none;
+      }
+      .foot b {
+        color: #f0935c;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="brand">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 7l6 5-6 5" fill="none" stroke="#f0935c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M12.5 18H20" fill="none" stroke="#e9e7e2" stroke-width="2.2" stroke-linecap="round" />
+      </svg>
+      Bashir Aremu
+    </div>
+    <h1>I test web apps, APIs and AI agents the way an attacker would.</h1>
+    <div class="foot">
+      <span><b>$</b> whoami</span>
+      <span>Application security engineer</span>
+    </div>
+  </body>
+</html>
