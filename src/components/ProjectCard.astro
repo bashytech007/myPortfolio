@@ -8,11 +8,14 @@ interface Props {
   level?: 2 | 3;
   /** `sizes` attribute for the screenshot. */
   sizes?: string;
+  /** Load the screenshot straight away. Use for a card that starts on screen. */
+  priority?: boolean;
 }
 
 const {
   project,
   level = 3,
+  priority = false,
   sizes = '(min-width: 73rem) 352px, (min-width: 60rem) 31vw, (min-width: 40rem) 290px, calc(100vw - 2.5rem)',
 } = Astro.props;
 const { title, summary, kind, tags, image, imageAlt, live, liveLabel, source, draft } = project.data;
@@ -23,7 +26,14 @@ const Heading = `h${level}` as 'h2' | 'h3';
   {
     image && (
       <div class="project__media">
-        <Image src={image} alt={imageAlt ?? ''} widths={[360, 540, 720, 1080]} sizes={sizes} />
+        <Image
+          src={image}
+          alt={imageAlt ?? ''}
+          widths={[360, 540, 720, 1080]}
+          sizes={sizes}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchpriority={priority ? 'high' : undefined}
+        />
       </div>
     )
   }

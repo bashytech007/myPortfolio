@@ -34,7 +34,7 @@ const earlier = projects.filter((p) => p.data.kind === 'development' && !p.data.
         <p>Tooling and hardening work.</p>
       </div>
       <div class="project-grid">
-        {security.map((project) => <ProjectCard project={project} />)}
+        {security.map((project, i) => <ProjectCard project={project} priority={i === 0} />)}
       </div>
     </section>
 
