@@ -766,18 +766,28 @@ samp {
    Motion
    ========================================================================== */
 
-/* Sections below the fold fade up once as they enter. The class is only added
-   by script, so content is never hidden when JavaScript does not run. */
+/* Sections below the fold fade in once as they arrive, rising 8px. Both
+   classes are only added by script (src/scripts/reveal.ts), so content is
+   never hidden when JavaScript does not run, and the script leaves everything
+   alone under reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
   .reveal-pending {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(8px);
   }
 
   .reveal-in {
     transition:
-      opacity 700ms var(--ease-out),
-      transform 700ms var(--ease-out);
+      opacity var(--dur-move) var(--ease-out),
+      transform var(--dur-move) var(--ease-out);
+  }
+}
+
+/* Paper shows every section, whether or not it has been scrolled to. */
+@media print {
+  .reveal-pending {
+    opacity: 1;
+    transform: none;
   }
 }
 
