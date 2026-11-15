@@ -164,7 +164,6 @@ html:has(.term-page) {
     0 0 28px -8px var(--ph-glow),
     inset 0 0 72px rgb(0 0 0 / 0.55);
   overflow: hidden;
-  transition: border-color 200ms var(--ease);
 }
 
 .tty__frame:has(.term-input:focus-visible) {
