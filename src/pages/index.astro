@@ -374,35 +374,74 @@ const number = {
     line-height: 1.4;
   }
 
+  /* The entrance: one sequence, played once on load and over by 620ms. This
+     is the only motion on the site allowed past the duration tokens.
+
+       0ms  name, first line    rises inside its clip      520ms
+      60ms  name, second line   the same                   520ms
+     180ms  roles, statement    fade in, rising 8px        320ms
+     240ms  both buttons        the same                   320ms
+     300ms  facts               fade in                    320ms
+
+     The name is never transparent, because it is the largest paint on the
+     page. `backwards` holds each start state only until its turn; once an
+     animation ends the element is back on its own styles, so the buttons'
+     hover and press states are untouched. */
   @media (prefers-reduced-motion: no-preference) {
     .hero__word {
-      animation: hero-rise 1000ms var(--ease-out) both;
+      animation: hero-rise 520ms var(--ease-out) backwards;
     }
 
     .hero__line + .hero__line .hero__word {
-      animation-delay: 110ms;
+      animation-delay: 60ms;
     }
 
     .hero__roles,
-    .hero__foot {
-      animation: hero-fade 800ms var(--ease-out) 350ms both;
+    .hero__statement {
+      animation: hero-arrive 320ms var(--ease-out) 180ms backwards;
     }
 
+    .hero__actions {
+      animation: hero-arrive 320ms var(--ease-out) 240ms backwards;
+    }
+
+    .hero__facts {
+      animation: hero-fade 320ms var(--ease-out) 300ms backwards;
+    }
+
+    /* The cursor starts blinking a beat after everything has landed. */
     .hero__cursor {
-      animation: hero-blink 1.2s steps(1, end) 1.4s infinite;
+      animation: hero-blink 1.2s steps(1, end) 1s infinite;
+    }
+  }
+
+  /* Reduced motion: the name is simply there and the rest fades in, with no
+     movement. The duration is restated to get past the site-wide rule that
+     cuts every animation short under this setting. */
+  @media (prefers-reduced-motion: reduce) {
+    .hero__roles,
+    .hero__foot {
+      animation: hero-fade var(--dur-move) var(--ease) backwards;
+      animation-duration: var(--dur-move) !important;
     }
   }
 
   @keyframes hero-rise {
     from {
-      transform: translateY(105%);
+      transform: translateY(100%);
+    }
+  }
+
+  @keyframes hero-arrive {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
     }
   }
 
   @keyframes hero-fade {
     from {
       opacity: 0;
-      transform: translateY(10px);
     }
   }
 
