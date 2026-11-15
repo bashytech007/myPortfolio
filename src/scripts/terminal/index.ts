@@ -186,8 +186,8 @@ export function initTerminal(): void {
   // With a mouse, clicking anywhere in the window focuses the prompt, unless
   // the click was on a link or was the end of a text selection.
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    screen.addEventListener('click', (event) => {
-      if ((event.target as HTMLElement).closest('a, button')) return;
+    root.addEventListener('click', (event) => {
+      if ((event.target as HTMLElement).closest('a, button, input, label')) return;
       if (!window.getSelection()?.isCollapsed) return;
       input.focus({ preventScroll: true });
     });

@@ -85,6 +85,17 @@
   --on-accent: #17100a;
   --accent-wash: rgb(240 147 92 / 0.1);
   --shadow: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 28px 56px -32px rgb(0 0 0 / 0.75);
+  --shadow-window:
+    0 2px 6px rgb(0 0 0 / 0.35), 0 18px 36px -14px rgb(0 0 0 / 0.6),
+    0 56px 96px -36px rgb(0 0 0 / 0.9);
+  --shadow-lift: 0 12px 22px -14px rgb(0 0 0 / 0.85);
+  --btn-highlight: rgb(255 255 255 / 0.38);
+  --bar-highlight: rgb(255 255 255 / 0.05);
+  --grid-line: rgb(233 231 226 / 0.05);
+  --glow: rgb(240 147 92 / 0.16);
+  --dot-close: #a8645c;
+  --dot-min: #a58a58;
+  --dot-max: #62876a;
 }
 
 :root[data-theme='light'] {
@@ -102,11 +113,29 @@
   --on-accent: #ffffff;
   --accent-wash: rgb(171 67 24 / 0.08);
   --shadow: 0 28px 56px -36px rgb(23 25 28 / 0.35);
+  --shadow-window:
+    0 2px 6px rgb(23 25 28 / 0.06), 0 18px 36px -14px rgb(23 25 28 / 0.16),
+    0 56px 96px -36px rgb(23 25 28 / 0.34);
+  --shadow-lift: 0 12px 22px -14px rgb(23 25 28 / 0.45);
+  --btn-highlight: rgb(255 255 255 / 0.24);
+  --bar-highlight: rgb(255 255 255 / 0.6);
+  --grid-line: rgb(23 25 28 / 0.055);
+  --glow: rgb(171 67 24 / 0.1);
+  --dot-close: #d2928a;
+  --dot-min: #d3bb88;
+  --dot-max: #98bd9f;
+}
+
+@media (min-width: 40rem) {
+  :root {
+    --header-h: 4rem;
+  }
 }
 
 @media (min-width: 48rem) {
   :root {
     --section-gap: var(--s-12);
+    --band-pad: 4.5rem;
     --gutter: 2rem;
     --text-body: 1.125rem;
   }
