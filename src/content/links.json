@@ -1,0 +1,11 @@
+{
+  "contact": [
+    { "id": "email", "label": "Email", "text": "bashiraremu474@gmail.com", "href": "mailto:bashiraremu474@gmail.com" },
+    { "id": "whatsapp", "label": "WhatsApp", "text": "+234 915 653 3542", "href": "https://wa.me/2349156533542" }
+  ],
+  "social": [
+    { "id": "github", "label": "GitHub", "text": "bashytech007", "href": "https://github.com/bashytech007" },
+    { "id": "linkedin", "label": "LinkedIn", "text": "bashir-aremu", "href": "https://www.linkedin.com/in/bashir-aremu-880813aa/" },
+    { "id": "x", "label": "X", "text": "@bashysureboi", "href": "https://twitter.com/bashysureboi" }
+  ]
+}
